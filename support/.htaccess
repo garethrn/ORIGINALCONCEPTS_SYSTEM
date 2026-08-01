@@ -1,0 +1,73 @@
+# Original Concepts Support System – Apache Configuration
+
+# ─── General Security ──────────────────────────────────────────────────────────
+Options -Indexes -ExecCGI
+ServerSignature Off
+
+# Force HTTPS (uncomment when SSL is active)
+# RewriteEngine On
+# RewriteCond %{HTTPS} !=on
+# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ─── Block access to sensitive directories ────────────────────────────────────
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Block direct access to config files
+    RewriteRule ^config/ - [F,L]
+
+    # Block access to install directory after installation
+    # Uncomment this after completing installation:
+    # RewriteRule ^install/ - [F,L]
+
+    # Hide .env and similar files
+    RewriteRule \.env - [F,L]
+    RewriteRule \.htaccess - [F,L]
+    RewriteRule \.git - [F,L]
+
+    # Redirect / to /index.php (login if not authenticated)
+    RewriteRule ^$ index.php [L]
+</IfModule>
+
+# ─── Security Headers ─────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(self), camera=(), microphone=()"
+</IfModule>
+
+# ─── PHP Settings ─────────────────────────────────────────────────────────────
+<IfModule mod_php.c>
+    php_flag  display_errors        Off
+    php_flag  log_errors            On
+    php_value upload_max_filesize   10M
+    php_value post_max_size         12M
+    php_value max_execution_time    60
+    php_value session.cookie_httponly 1
+    php_value session.cookie_secure   1
+    php_value session.use_strict_mode 1
+</IfModule>
+
+# ─── Deny access to upload directory PHP files ────────────────────────────────
+<FilesMatch "\.(php|php3|php4|php5|phtml)$">
+    <If "%{REQUEST_URI} =~ m#/uploads/#">
+        Deny from all
+    </If>
+</FilesMatch>
+
+# ─── Cache static assets ──────────────────────────────────────────────────────
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css             "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+    ExpiresByType image/png            "access plus 1 month"
+    ExpiresByType image/jpeg           "access plus 1 month"
+    ExpiresByType image/gif            "access plus 1 month"
+</IfModule>
+
+# ─── Gzip Compression ─────────────────────────────────────────────────────────
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css application/javascript application/json
+</IfModule>

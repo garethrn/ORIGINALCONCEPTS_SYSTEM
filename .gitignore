@@ -1,0 +1,26 @@
+# Dependencies (never commit)
+/support/vendor/
+node_modules/
+
+# Uploads (user-generated content)
+/support/uploads/*
+!/support/uploads/.gitkeep
+
+# Installed flag
+/support/config/.installed
+
+# Sensitive config (override locally)
+*.env
+.env.*
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.log
+*.tmp
