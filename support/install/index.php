@@ -6,9 +6,61 @@
  * DELETE THIS FOLDER after installation is complete.
  */
 
-// Prevent running if already installed
-if (file_exists(__DIR__ . '/../config/.installed')) {
-    die('<h2>Already installed. Please delete the /install directory.</h2>');
+$installedFlag = __DIR__ . '/../config/.installed';
+
+// Allow resetting the installation lock via ?reset=confirm
+if (isset($_GET['reset']) && $_GET['reset'] === 'confirm' && file_exists($installedFlag)) {
+    unlink($installedFlag);
+    header('Location: ?step=1');
+    exit;
+}
+
+// Prevent running if already installed (show reset option instead of hard die)
+if (file_exists($installedFlag)) {
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Already Installed – Original Concepts Support System</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <style>
+        body { background: linear-gradient(135deg, #1a3c5e, #2d6a9f); min-height: 100vh; display:flex; align-items:center; }
+        .install-card { max-width: 560px; width: 100%; margin: auto; border-radius: 12px; overflow: hidden; }
+        .install-logo { background: rgba(255,255,255,.1); padding: 1.5rem; text-align: center; color:#fff; }
+    </style>
+</head>
+<body class="py-5">
+<div class="container">
+    <div class="install-card card shadow-lg mx-auto">
+        <div class="install-logo">
+            <h3 class="fw-bold mb-0">Original Concepts Support System</h3>
+            <p class="mb-0 opacity-75 small">Web Installer</p>
+        </div>
+        <div class="card-body p-4">
+            <div class="alert alert-warning">
+                <h5 class="alert-heading"><i class="bi bi-shield-lock me-2"></i>Already Installed</h5>
+                <p class="mb-2">The system is already installed. For security, please <strong>delete the <code>/install</code> folder</strong> from your server.</p>
+                <hr>
+                <p class="mb-0 small">If you need to re-run the installer (e.g. after a failed setup), you can reset the installation lock below.</p>
+            </div>
+            <div class="d-grid gap-2">
+                <a href="../auth/login.php" class="btn btn-primary">Go to Login Page →</a>
+                <a href="?reset=confirm"
+                   class="btn btn-outline-danger btn-sm"
+                   onclick="return confirm('This will delete the installation lock and allow re-running the installer. Are you sure?')">
+                    Reset Installation Lock &amp; Re-run Wizard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+</body>
+</html>
+<?php
+    exit;
 }
 
 $step   = (int)($_POST['step'] ?? $_GET['step'] ?? 1);
@@ -81,7 +133,7 @@ if ($step === 2 && $_SERVER['REQUEST_METHOD'] === 'POST') {
             file_put_contents(__DIR__ . '/../config/config.php', $mainConfig);
 
             // Mark as installed
-            file_put_contents(__DIR__ . '/../config/.installed', date('Y-m-d H:i:s'));
+            file_put_contents($installedFlag, date('Y-m-d H:i:s'));
 
             $success = true;
         } catch (PDOException $e) {
