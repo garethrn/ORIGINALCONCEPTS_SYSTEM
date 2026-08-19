@@ -38,9 +38,26 @@ function db(): PDO
         try {
             $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
         } catch (PDOException $e) {
-            // Log error without exposing credentials
             error_log('Database connection failed: ' . $e->getMessage());
-            die('<h2>Database connection failed. Please check your configuration.</h2>');
+            // Output a standalone error page so the message is always visible,
+            // even if called mid-way through rendering another page's HTML.
+            while (ob_get_level()) {
+                ob_end_clean();
+            }
+            http_response_code(503);
+            echo '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'
+               . '<meta name="viewport" content="width=device-width,initial-scale=1">'
+               . '<title>Database Error</title>'
+               . '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">'
+               . '</head><body class="bg-light">'
+               . '<div class="container py-5"><div class="alert alert-danger shadow-sm">'
+               . '<h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill me-2"></i>Database Connection Failed</h4>'
+               . '<p class="mb-2">The system could not connect to the database. Please check your database credentials in <code>config/database.php</code>.</p>'
+               . '<hr><p class="mb-0 small text-muted">If you have not run the installer yet, visit <a href="/support/install/">/support/install/</a> to set up the database.</p>'
+               . '</div></div>'
+               . '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">'
+               . '</body></html>';
+            exit;
         }
     }
 

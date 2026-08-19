@@ -7,6 +7,13 @@ requireLogin();
 $pageTitle = 'Dashboard';
 $user      = currentUser();
 
+// Guard: if the user record cannot be loaded (e.g. DB misconfigured) log out
+// cleanly so the admin sees the login page rather than a blank crash.
+if (!$user) {
+    logout();
+    redirect(BASE_URL . '/auth/login.php?error=session');
+}
+
 // ─── Dashboard Stats ──────────────────────────────────────────────────────────
 $stats = [
     'tickets_open'     => dbRow('SELECT COUNT(*) AS n FROM tickets WHERE status IN (\'open\',\'in_progress\',\'waiting\')')['n'] ?? 0,

@@ -6,6 +6,10 @@ requireLogin();
 
 $pageTitle = 'My Profile';
 $user      = currentUser();
+if (!$user) {
+    logout();
+    redirect(BASE_URL . '/auth/login.php?error=session');
+}
 $errors    = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

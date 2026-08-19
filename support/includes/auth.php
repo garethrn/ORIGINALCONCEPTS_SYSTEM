@@ -31,11 +31,13 @@ function isLoggedIn(): bool
 function currentUser(): ?array
 {
     if (!isLoggedIn()) return null;
-    static $user = null;
-    if ($user === null) {
-        $user = dbRow('SELECT * FROM users WHERE id = ? AND is_active = 1', [$_SESSION['user_id']]);
+    static $user  = null;
+    static $fetched = false;
+    if (!$fetched) {
+        $fetched = true;
+        $user = dbRow('SELECT * FROM users WHERE id = ? AND is_active = 1', [$_SESSION['user_id']]) ?: null;
     }
-    return $user ?: null;
+    return $user;
 }
 
 function currentUserId(): int

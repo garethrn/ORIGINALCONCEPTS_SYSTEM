@@ -9,6 +9,10 @@ if (isLoggedIn()) {
 
 $error = '';
 
+if (isset($_GET['error']) && $_GET['error'] === 'session') {
+    $error = 'Your session could not be loaded. Please log in again.';
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verifyCsrf($_POST['csrf_token'] ?? '')) {
         $error = 'Invalid request. Please try again.';
