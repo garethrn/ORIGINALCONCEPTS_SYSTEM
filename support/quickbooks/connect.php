@@ -134,7 +134,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
                     <li class="mb-2">
                         <strong>Set Redirect URI</strong><br>
                         Add this exact URL as a Redirect URI in your app settings:<br>
-                        <code class="d-block mt-1 p-1 bg-light rounded"><?= SITE_URL ?>/quickbooks/callback.php</code>
+                        <code class="d-block mt-1 p-1 bg-light rounded"><?= e(QB_REDIRECT_URI) ?></code>
                     </li>
                     <li class="mb-2">
                         <strong>Copy Credentials</strong><br>

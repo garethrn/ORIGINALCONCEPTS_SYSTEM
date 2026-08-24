@@ -40,7 +40,7 @@ define('SMTP_FROM_NAME', 'Original Concepts Support');
 // ─── QuickBooks ───────────────────────────────────────────────────────────────
 define('QB_CLIENT_ID',     '');        // From QuickBooks Developer Console
 define('QB_CLIENT_SECRET', '');        // From QuickBooks Developer Console
-define('QB_REDIRECT_URI',  SITE_URL . '/quickbooks/callback.php');
+define('QB_REDIRECT_URI',  rtrim(SITE_URL, '/') . '/quickbooks/callback.php');
 define('QB_SCOPE',         'com.intuit.quickbooks.accounting');
 define('QB_ENVIRONMENT',   'production'); // 'sandbox' | 'production'
 define('QB_BASE_URL',      'https://quickbooks.api.intuit.com');
