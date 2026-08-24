@@ -1,0 +1,240 @@
+/* =====================================================
+   Original Concepts Support System – Custom Styles
+   ===================================================== */
+
+:root {
+    --oc-primary:   #1a3c5e;
+    --oc-secondary: #2d6a9f;
+    --oc-accent:    #f5a623;
+    --oc-light:     #f8f9fa;
+    --oc-dark:      #212529;
+    --oc-border:    #dee2e6;
+}
+
+/* ─── Base ─────────────────────────────────────────── */
+body {
+    background-color: #f0f2f5;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ─── Navbar ───────────────────────────────────────── */
+.oc-navbar {
+    background: linear-gradient(135deg, var(--oc-primary) 0%, var(--oc-secondary) 100%);
+    box-shadow: 0 2px 8px rgba(0,0,0,.25);
+    padding: .55rem 1rem;
+}
+
+.oc-navbar .navbar-brand {
+    font-size: 1.1rem;
+    letter-spacing: .5px;
+}
+
+.oc-navbar .nav-link {
+    font-size: .875rem;
+    padding: .4rem .75rem;
+    border-radius: 4px;
+    transition: background .15s;
+}
+
+.oc-navbar .nav-link:hover,
+.oc-navbar .nav-link.active {
+    background: rgba(255,255,255,.15);
+}
+
+/* ─── Avatar Circle ────────────────────────────────── */
+.avatar-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--oc-accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: .8rem;
+}
+
+/* ─── Cards ────────────────────────────────────────── */
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+}
+
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid var(--oc-border);
+    font-weight: 600;
+    font-size: .9rem;
+}
+
+/* ─── Stat Cards ───────────────────────────────────── */
+.stat-card {
+    border-left: 4px solid var(--oc-primary);
+}
+
+.stat-card .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.stat-card .stat-label {
+    font-size: .78rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+}
+
+.stat-card.primary   { border-left-color: #0d6efd; }
+.stat-card.success   { border-left-color: #198754; }
+.stat-card.warning   { border-left-color: #ffc107; }
+.stat-card.danger    { border-left-color: #dc3545; }
+.stat-card.info      { border-left-color: #0dcaf0; }
+.stat-card.secondary { border-left-color: #6c757d; }
+
+/* ─── Tables ───────────────────────────────────────── */
+.table th {
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: #6c757d;
+    white-space: nowrap;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(26, 60, 94, .04);
+}
+
+/* ─── Badges ───────────────────────────────────────── */
+.badge {
+    font-size: .72rem;
+    font-weight: 500;
+    padding: .3em .55em;
+}
+
+/* ─── Priority Indicators ──────────────────────────── */
+.priority-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 4px;
+}
+
+/* ─── Ticket Detail ────────────────────────────────── */
+.ticket-desc {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 1rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.comment-item {
+    border-left: 3px solid var(--oc-border);
+    padding-left: 1rem;
+    margin-bottom: 1rem;
+}
+
+.comment-item.internal {
+    border-left-color: var(--oc-accent);
+    background: #fffbf0;
+    border-radius: 0 6px 6px 0;
+    padding: .75rem 1rem;
+}
+
+/* ─── Timeline ─────────────────────────────────────── */
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: .5rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--oc-border);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 1.25rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.55rem;
+    top: .3rem;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--oc-secondary);
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px var(--oc-secondary);
+}
+
+/* ─── Login Page ───────────────────────────────────── */
+.login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--oc-primary) 0%, var(--oc-secondary) 100%);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,.3);
+}
+
+.login-logo {
+    background: rgba(255,255,255,.1);
+    padding: 1.5rem;
+    text-align: center;
+    color: #fff;
+}
+
+/* ─── Footer ───────────────────────────────────────── */
+.oc-footer {
+    background: #fff;
+    border-top: 1px solid var(--oc-border);
+    padding: .75rem 0;
+    margin-top: auto;
+}
+
+/* ─── QuickBooks Connect Button ────────────────────── */
+.btn-quickbooks {
+    background: #2ca01c;
+    color: #fff;
+    border: none;
+}
+
+.btn-quickbooks:hover {
+    background: #228c17;
+    color: #fff;
+}
+
+/* ─── Responsive ───────────────────────────────────── */
+@media (max-width: 768px) {
+    .stat-value { font-size: 1.5rem; }
+    .d-none-mobile { display: none !important; }
+}
+
+/* ─── Print ────────────────────────────────────────── */
+@media print {
+    .oc-navbar, .oc-footer, .btn, .alert { display: none !important; }
+    .card { box-shadow: none; border: 1px solid #ccc; }
+}
