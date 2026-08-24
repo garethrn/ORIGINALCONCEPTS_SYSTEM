@@ -67,6 +67,41 @@ function requireRole(string ...$roles): void
     }
 }
 
+function userCanAccessBilling(?array $user = null): bool
+{
+    $user = $user ?: currentUser();
+    if (!$user) return false;
+    if ($user['role'] === 'admin') return true;
+    if ($user['role'] === 'manager') return appSettingBool('allow_manager_billing', true);
+    return false;
+}
+
+function userCanManageClients(?array $user = null): bool
+{
+    $user = $user ?: currentUser();
+    if (!$user) return false;
+    if ($user['role'] === 'admin') return true;
+    if ($user['role'] === 'manager') return appSettingBool('allow_manager_clients', true);
+    if ($user['role'] === 'technician') return appSettingBool('allow_technician_clients', true);
+    return false;
+}
+
+function requireBillingAccess(): void
+{
+    requireLogin();
+    if (!userCanAccessBilling()) {
+        redirect(BASE_URL . '/index.php?error=forbidden');
+    }
+}
+
+function requireClientManagementAccess(): void
+{
+    requireLogin();
+    if (!userCanManageClients()) {
+        redirect(BASE_URL . '/index.php?error=forbidden');
+    }
+}
+
 function login(string $email, string $password): bool
 {
     $user = dbRow('SELECT * FROM users WHERE email = ? AND is_active = 1', [strtolower(trim($email))]);

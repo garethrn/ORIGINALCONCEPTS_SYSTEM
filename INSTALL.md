@@ -290,6 +290,11 @@ chmod 755 /home/yourusername/public_html/support/uploads
 4. **Connect QuickBooks** (optional):
    - Go to **Billing** → **QuickBooks**
 
+5. **Review Admin Settings**:
+   - Go to **Settings** (admin only)
+   - Configure default invoice VAT and due days
+   - Control whether managers can access billing and whether managers/technicians can manage clients
+
 ---
 
 ## 10. Feature Overview <a name="feature-overview"></a>

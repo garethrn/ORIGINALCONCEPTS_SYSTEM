@@ -108,6 +108,42 @@ function money(float $amount): string
     return CURRENCY_SYMBOL . ' ' . number_format($amount, 2, '.', ',');
 }
 
+function appSettingsTableExists(): bool
+{
+    static $exists = null;
+    if ($exists !== null) {
+        return $exists;
+    }
+
+    try {
+        dbQuery('SELECT 1 FROM app_settings LIMIT 1');
+        $exists = true;
+    } catch (Throwable $e) {
+        $exists = false;
+    }
+
+    return $exists;
+}
+
+function appSetting(string $key, string $default = ''): string
+{
+    if (!appSettingsTableExists()) {
+        return $default;
+    }
+
+    $row = dbRow('SELECT setting_value FROM app_settings WHERE setting_key = ?', [$key]);
+    if (!$row) {
+        return $default;
+    }
+
+    return (string)$row['setting_value'];
+}
+
+function appSettingBool(string $key, bool $default = false): bool
+{
+    return appSetting($key, $default ? '1' : '0') === '1';
+}
+
 // ─── Pagination ───────────────────────────────────────────────────────────────
 
 function paginate(int $total, int $page, int $perPage = ITEMS_PER_PAGE): array

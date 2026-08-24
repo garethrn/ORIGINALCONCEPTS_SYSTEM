@@ -3,7 +3,7 @@ define('OC_SYSTEM', true);
 require_once dirname(__DIR__) . '/includes/bootstrap.php';
 
 requireLogin();
-requireRole('admin', 'manager');
+requireBillingAccess();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !verifyCsrf($_POST['csrf_token'] ?? '')) {
     redirect(BASE_URL . '/payments/index.php');

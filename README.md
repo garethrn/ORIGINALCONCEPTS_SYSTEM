@@ -19,6 +19,7 @@ See **[INSTALL.md](INSTALL.md)** for the complete installation guide.
 - **Location** — GPS coordinates for clients with Google Maps navigation for field technicians
 - **Email Notifications** — Auto email alerts to clients on ticket create/update/resolve
 - **Role-based Access** — Admin, Manager, Technician, Client roles
+- **Admin Settings** — Configure invoice defaults and billing/client access permissions
 - **Web Installer** — One-page setup wizard for easy deployment on shared hosting
 
 ## 🛠️ Tech Stack

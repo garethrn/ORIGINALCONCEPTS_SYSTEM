@@ -3,7 +3,7 @@ define('OC_SYSTEM', true);
 require_once dirname(__DIR__) . '/includes/bootstrap.php';
 
 requireLogin();
-requireRole('admin', 'manager', 'technician');
+requireClientManagementAccess();
 
 $id     = (int)($_GET['id'] ?? 0);
 $client = dbRow('SELECT * FROM clients WHERE id = ?', [$id]);
@@ -119,7 +119,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
         </div>
 
         <!-- Invoices -->
-        <?php if (hasRole('admin', 'manager')): ?>
+        <?php if (userCanAccessBilling()): ?>
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <span><i class="bi bi-receipt me-2"></i>Invoices</span>
@@ -190,7 +190,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
             <div class="card-header"><i class="bi bi-lightning me-2"></i>Quick Actions</div>
             <div class="card-body d-grid gap-2">
                 <a href="<?= BASE_URL ?>/tickets/create.php?client_id=<?= $id ?>" class="btn btn-outline-primary btn-sm text-start"><i class="bi bi-ticket-detailed me-2"></i>Create Ticket</a>
-                <?php if (hasRole('admin','manager')): ?>
+                <?php if (userCanAccessBilling()): ?>
                 <a href="<?= BASE_URL ?>/invoices/create.php?client_id=<?= $id ?>" class="btn btn-outline-success btn-sm text-start"><i class="bi bi-file-earmark-text me-2"></i>Create Invoice</a>
                 <a href="<?= BASE_URL ?>/quotes/create.php?client_id=<?= $id ?>" class="btn btn-outline-info btn-sm text-start"><i class="bi bi-file-earmark-ruled me-2"></i>Create Quote</a>
                 <?php endif; ?>

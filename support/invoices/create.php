@@ -3,7 +3,7 @@ define('OC_SYSTEM', true);
 require_once dirname(__DIR__) . '/includes/bootstrap.php';
 
 requireLogin();
-requireRole('admin', 'manager');
+requireBillingAccess();
 
 $pageTitle = 'Create Invoice';
 $errors    = [];
@@ -13,13 +13,14 @@ $ticketId   = (int)($_GET['ticket_id'] ?? 0);
 $clientIdPre = (int)($_GET['client_id'] ?? 0);
 
 $prefillTicket = $ticketId ? dbRow('SELECT * FROM tickets WHERE id = ?', [$ticketId]) : null;
-$vatRate       = 15; // South African VAT
+$vatRate       = max(0, (float)appSetting('invoice_default_tax_rate', '15'));
+$defaultDueDays = max(1, (int)appSetting('invoice_default_due_days', '30'));
 
 $formData = [
     'client_id'  => $clientIdPre ?: ($prefillTicket['client_id'] ?? 0),
     'ticket_id'  => $ticketId,
     'notes'      => $prefillTicket ? 'Service: ' . ($prefillTicket['title'] ?? '') : '',
-    'due_days'   => 30,
+    'due_days'   => $defaultDueDays,
     'tax_rate'   => $vatRate,
 ];
 
@@ -30,8 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $clientId  = (int)($_POST['client_id']  ?? 0);
         $ticketRef = (int)($_POST['ticket_id']  ?? 0);
         $notes     = sanitize($_POST['notes']   ?? '');
-        $taxRate   = max(0, (float)($_POST['tax_rate'] ?? 15));
-        $dueDays   = max(1, (int)($_POST['due_days']   ?? 30));
+        $taxRate   = max(0, (float)($_POST['tax_rate'] ?? $vatRate));
+        $dueDays   = max(1, (int)($_POST['due_days']   ?? $defaultDueDays));
 
         $formData  = compact('clientId', 'notes', 'taxRate', 'dueDays');
         $formData['client_id'] = $clientId;
@@ -200,7 +201,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
                 <div class="card-body small text-muted">
                     <ul class="ps-3 mb-0">
                         <li class="mb-1">Invoices are created as <strong>Draft</strong> – change to <strong>Sent</strong> when emailed to client.</li>
-                        <li class="mb-1">VAT is set to <strong>15%</strong> (South African standard).</li>
+                        <li class="mb-1">VAT defaults to <strong><?= e((string)$vatRate) ?>%</strong> (adjust in Admin Settings).</li>
                         <li class="mb-1">Invoices can be synced to <strong>QuickBooks</strong> from the invoice view.</li>
                         <li>Payment terms are calculated from today's date.</li>
                     </ul>

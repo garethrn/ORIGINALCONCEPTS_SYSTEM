@@ -49,7 +49,7 @@ if (hasRole('technician')) {
 
 // ─── Overdue Invoices ─────────────────────────────────────────────────────────
 $overdueInvoices = [];
-if (hasRole('admin', 'manager')) {
+if (userCanAccessBilling()) {
     $overdueInvoices = dbRows(
         'SELECT i.*, c.name AS client_name
          FROM invoices i
@@ -111,7 +111,7 @@ require_once __DIR__ . '/includes/header.php';
             </div>
         </div>
     </div>
-    <?php if (hasRole('admin', 'manager')): ?>
+    <?php if (userCanAccessBilling()): ?>
     <div class="col-6 col-md-4 col-lg-2">
         <div class="card stat-card warning h-100">
             <div class="card-body">
@@ -183,10 +183,12 @@ require_once __DIR__ . '/includes/header.php';
                 <a href="<?= BASE_URL ?>/tickets/create.php" class="btn btn-outline-primary btn-sm text-start">
                     <i class="bi bi-plus-circle me-2"></i>Create Ticket
                 </a>
+                <?php if (userCanManageClients()): ?>
                 <a href="<?= BASE_URL ?>/clients/create.php" class="btn btn-outline-secondary btn-sm text-start">
                     <i class="bi bi-person-plus me-2"></i>Add Client
                 </a>
-                <?php if (hasRole('admin', 'manager')): ?>
+                <?php endif; ?>
+                <?php if (userCanAccessBilling()): ?>
                 <a href="<?= BASE_URL ?>/invoices/create.php" class="btn btn-outline-success btn-sm text-start">
                     <i class="bi bi-file-earmark-plus me-2"></i>New Invoice
                 </a>

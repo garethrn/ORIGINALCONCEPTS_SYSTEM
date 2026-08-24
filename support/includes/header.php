@@ -49,7 +49,7 @@
                         <i class="bi bi-people"></i> Clients
                     </a>
                 </li>
-                <?php if (hasRole('admin', 'manager')): ?>
+                <?php if (userCanAccessBilling()): ?>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle <?= str_contains($_SERVER['REQUEST_URI'] ?? '', '/invoices/') || str_contains($_SERVER['REQUEST_URI'] ?? '', '/quotes/') ? 'active' : '' ?>"
                        href="#" data-bs-toggle="dropdown">
@@ -69,6 +69,12 @@
                     <a class="nav-link <?= str_contains($_SERVER['REQUEST_URI'] ?? '', '/users/') ? 'active' : '' ?>"
                        href="<?= BASE_URL ?>/users/index.php">
                         <i class="bi bi-person-badge"></i> Users
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <?= str_contains($_SERVER['REQUEST_URI'] ?? '', '/settings/') ? 'active' : '' ?>"
+                       href="<?= BASE_URL ?>/settings/index.php">
+                        <i class="bi bi-sliders"></i> Settings
                     </a>
                 </li>
                 <?php endif; ?>

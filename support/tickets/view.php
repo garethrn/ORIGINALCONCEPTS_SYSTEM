@@ -337,7 +337,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
         <?php endif; ?>
 
         <!-- Invoices for this ticket -->
-        <?php if (hasRole('admin','manager') && !empty($invoices)): ?>
+        <?php if (userCanAccessBilling() && !empty($invoices)): ?>
         <div class="card mb-3">
             <div class="card-header"><i class="bi bi-receipt me-2"></i>Related Invoices</div>
             <ul class="list-group list-group-flush">
@@ -355,7 +355,7 @@ require_once dirname(__DIR__) . '/includes/header.php';
         <?php endif; ?>
 
         <!-- Create Invoice Button -->
-        <?php if (hasRole('admin','manager') && !in_array($ticket['status'], ['cancelled'])): ?>
+        <?php if (userCanAccessBilling() && !in_array($ticket['status'], ['cancelled'])): ?>
         <div class="d-grid mb-3">
             <a href="<?= BASE_URL ?>/invoices/create.php?ticket_id=<?= $id ?>" class="btn btn-outline-success btn-sm">
                 <i class="bi bi-file-earmark-plus me-1"></i> Create Invoice from Ticket

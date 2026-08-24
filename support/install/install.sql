@@ -161,7 +161,23 @@ CREATE TABLE IF NOT EXISTS `qb_tokens` (
     `updated_at`               DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ─── Application Settings ──────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS `app_settings` (
+    `setting_key`   VARCHAR(100) PRIMARY KEY,
+    `setting_value` TEXT         NOT NULL,
+    `updated_at`    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET FOREIGN_KEY_CHECKS = 1;
+
+INSERT INTO `app_settings` (`setting_key`, `setting_value`) VALUES
+    ('invoice_default_due_days', '30'),
+    ('invoice_default_tax_rate', '15'),
+    ('allow_manager_billing', '1'),
+    ('allow_manager_clients', '1'),
+    ('allow_technician_clients', '1')
+ON DUPLICATE KEY UPDATE
+    `setting_value` = VALUES(`setting_value`);
 
 -- ─── Default Admin User ───────────────────────────────────────────────────────
 -- Password: Admin@1234  (CHANGE THIS IMMEDIATELY AFTER INSTALLATION)

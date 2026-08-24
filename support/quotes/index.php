@@ -3,7 +3,7 @@ define('OC_SYSTEM', true);
 require_once dirname(__DIR__) . '/includes/bootstrap.php';
 
 requireLogin();
-requireRole('admin', 'manager');
+requireBillingAccess();
 
 $pageTitle = 'Quotes';
 $page      = max(1, (int)($_GET['page'] ?? 1));

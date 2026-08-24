@@ -99,6 +99,22 @@ if ($step === 2 && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->exec("CREATE DATABASE IF NOT EXISTS `{$dbName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
             $pdo->exec("USE `{$dbName}`");
 
+            // Reset application tables for a clean install
+            $dropTables = [
+                'ticket_history',
+                'ticket_comments',
+                'invoices',
+                'quotes',
+                'tickets',
+                'qb_tokens',
+                'clients',
+                'users',
+                'app_settings',
+            ];
+            foreach ($dropTables as $table) {
+                $pdo->exec("DROP TABLE IF EXISTS `{$table}`");
+            }
+
             // Run SQL install script
             $sql = file_get_contents(__DIR__ . '/install.sql');
 
@@ -112,7 +128,16 @@ if ($step === 2 && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Insert admin user
             $hashedPass = password_hash($adminPass, PASSWORD_BCRYPT, ['cost' => 12]);
-            $stmt = $pdo->prepare("INSERT IGNORE INTO users (name, email, password, role, is_active, created_at, updated_at) VALUES (?, ?, ?, 'admin', 1, NOW(), NOW())");
+            $stmt = $pdo->prepare(
+                "INSERT INTO users (name, email, password, role, is_active, created_at, updated_at)
+                 VALUES (?, ?, ?, 'admin', 1, NOW(), NOW())
+                 ON DUPLICATE KEY UPDATE
+                    name = VALUES(name),
+                    password = VALUES(password),
+                    role = 'admin',
+                    is_active = 1,
+                    updated_at = NOW()"
+            );
             $stmt->execute([$adminName, strtolower($adminEmail), $hashedPass]);
 
             // Write config file

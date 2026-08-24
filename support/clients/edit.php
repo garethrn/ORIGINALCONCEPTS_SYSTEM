@@ -3,7 +3,7 @@ define('OC_SYSTEM', true);
 require_once dirname(__DIR__) . '/includes/bootstrap.php';
 
 requireLogin();
-requireRole('admin', 'manager', 'technician');
+requireClientManagementAccess();
 
 $id     = (int)($_GET['id'] ?? 0);
 $client = dbRow('SELECT * FROM clients WHERE id = ?', [$id]);
