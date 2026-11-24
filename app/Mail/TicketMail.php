@@ -33,7 +33,7 @@ class TicketMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            markdown: 'mail.ticket',
+            view: 'mail.ticket',
             with: [
                 'ticket' => Ticket::query()->with('client')->findOrFail($this->ticketId),
                 'event' => $this->event,

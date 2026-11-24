@@ -29,7 +29,7 @@ class SettingController extends Controller
     {
         abort_unless($request->user()->role->canManageSettings(), 403);
         $data = $request->validate([
-            'legal_name' => ['required', 'string', 'max:150'],
+            'legal_name' => ['nullable', 'string', 'max:150'],
             'trading_name' => ['nullable', 'string', 'max:150'],
             'address_line1' => ['nullable', 'string', 'max:200'],
             'address_line2' => ['nullable', 'string', 'max:200'],
@@ -41,6 +41,8 @@ class SettingController extends Controller
             'registration_number' => ['nullable', 'string', 'max:40'],
             'phone' => ['nullable', 'string', 'max:40'],
             'email' => ['required', 'email', 'max:150'],
+            'website' => ['nullable', 'string', 'max:150'],
+            'bbbee' => ['nullable', 'string', 'max:80'],
             'bank_name' => ['nullable', 'string', 'max:80'],
             'bank_account' => ['nullable', 'string', 'max:40'],
             'branch_code' => ['nullable', 'string', 'max:20'],

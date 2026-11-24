@@ -39,7 +39,7 @@ class DocumentMail extends Mailable implements ShouldQueue
         $document = $this->document();
 
         return new Content(
-            markdown: 'mail.document',
+            view: 'mail.document',
             with: [
                 'document' => $document,
                 'label' => match ($document::class) {

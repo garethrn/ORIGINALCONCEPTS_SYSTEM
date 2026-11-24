@@ -3,14 +3,15 @@
 <head>
     <meta charset="utf-8">
     <style>
-        body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color: #1a1a1a; }
-        h1 { color: #1a3c5e; font-size: 22px; margin-bottom: 0; }
+        body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color: #1a1206; background: #ffffff; }
+        h1 { color: #1a1206; font-size: 22px; margin: 8px 0 0; border-bottom: 3px solid #f5a623; padding-bottom: 6px; }
         table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-        th { background: #1a3c5e; color: #fff; text-align: left; padding: 6px; }
-        td { border-bottom: 1px solid #ddd; padding: 6px; vertical-align: top; }
+        th { background: #f5a623; color: #1a1206; text-align: left; padding: 6px; }
+        td { border-bottom: 1px solid #e6d3a1; padding: 6px; vertical-align: top; }
         .right { text-align: right; }
-        .muted { color: #555; }
+        .muted { color: #5c5346; }
         .totals { width: 46%; margin-left: auto; margin-top: 12px; }
+        .rule { border-top: 2px solid #f5a623; }
     </style>
 </head>
 <body>
@@ -22,13 +23,18 @@
         default => $document->isDraft() ? 'Draft credit note' : 'Credit Note',
     };
     $customer = $document->client;
+    $supplier = $profile['legal_name'] !== '' ? $profile['legal_name'] : ($profile['trading_name'] ?? '');
 @endphp
+<img src="{{ public_path('brand/logo.png') }}" alt="Original Concepts" style="height:42px;width:auto;">
 <h1>{{ $title }}</h1>
 <p>
-    <strong>{{ $profile['legal_name'] }}</strong><br>
+    <strong>{{ $supplier }}</strong><br>
     @foreach ($company->addressLines() as $line) {{ $line }}<br> @endforeach
-    VAT No: {{ $profile['vat_number'] !== '' ? $profile['vat_number'] : 'Not set' }}<br>
-    {{ $profile['email'] }} {{ $profile['phone'] }}
+    @if (($profile['vat_number'] ?? '') !== '') VAT No: {{ $profile['vat_number'] }}<br> @endif
+    {{ $profile['phone'] }}<br>
+    {{ $profile['email'] }}<br>
+    @if (($profile['website'] ?? '') !== '') {{ $profile['website'] }}<br> @endif
+    @if (($profile['bbbee'] ?? '') !== '') {{ $profile['bbbee'] }} @endif
 </p>
 <p>
     <strong>{{ $customer?->name }}</strong>

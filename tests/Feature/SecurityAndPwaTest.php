@@ -65,6 +65,8 @@ class SecurityAndPwaTest extends TestCase
         $response->assertSee('viewport-fit=cover', false);
         $response->assertSee('apple-touch-icon', false);
         $response->assertSee('OC Support', false);
+        $response->assertSee('#0b0f1a', false);
+        $response->assertSee('brand/logo.png', false);
 
         $manifest = $this->get('/manifest.webmanifest');
         $manifest->assertOk();
@@ -74,6 +76,8 @@ class SecurityAndPwaTest extends TestCase
         $this->assertSame('/login', $manifest->json('start_url'));
         $this->assertSame('/', $manifest->json('scope'));
         $this->assertSame('standalone', $manifest->json('display'));
+        $this->assertSame('#0b0f1a', $manifest->json('theme_color'));
+        $this->assertSame('#0b0f1a', $manifest->json('background_color'));
         $this->assertCount(4, $manifest->json('icons'));
 
         $worker = $this->get('/sw.js');

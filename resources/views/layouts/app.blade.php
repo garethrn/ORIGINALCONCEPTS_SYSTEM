@@ -5,7 +5,7 @@
     <title>{{ $title ?? 'Dashboard' }} — Original Concepts Support</title>
     @include('partials.pwa')
 </head>
-<body class="bg-slate-100 text-slate-900 antialiased">
+<body class="antialiased">
 @php
     $user = auth()->user();
     $links = [
@@ -23,17 +23,18 @@
         ['Settings', route('settings.edit'), $user->role->canManageSettings()],
     ];
 @endphp
-<header class="oc-header bg-oc-navy text-white">
+<header class="oc-header">
     <div class="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
-        <button type="button" data-nav-toggle class="btn min-w-11 bg-white/10 lg:hidden" aria-label="Open menu">Menu</button>
-        <a href="{{ route('dashboard') }}" class="font-semibold tracking-tight">Original Concepts <span class="text-oc-gold">Support</span></a>
+        <button type="button" data-nav-toggle class="btn btn-ghost min-w-11 lg:hidden" aria-label="Open menu">Menu</button>
+        <a href="{{ route('dashboard') }}"><img src="{{ asset('brand/logo.png') }}" alt="Original Concepts" class="oc-logo"></a>
         <div class="ml-auto text-sm">{{ $user->name }}</div>
     </div>
     <nav data-nav class="hidden border-t border-white/10 lg:block">
         <div class="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-2 lg:flex-row lg:flex-wrap lg:items-center">
             @foreach ($links as [$label, $href, $show])
                 @if ($show)
-                    <a class="rounded-lg px-3 py-2 text-sm hover:bg-white/10" href="{{ $href }}">{{ $label }}</a>
+                    @php $path = trim((string) parse_url($href, PHP_URL_PATH), '/'); @endphp
+                    <a class="rounded-lg px-3 py-2 text-sm {{ request()->is($path) || request()->is($path.'/*') ? 'is-active' : '' }}" href="{{ $href }}">{{ $label }}</a>
                 @endif
             @endforeach
             <a class="rounded-lg px-3 py-2 text-sm hover:bg-white/10 lg:ml-auto" href="{{ route('profile.edit') }}">Profile</a>

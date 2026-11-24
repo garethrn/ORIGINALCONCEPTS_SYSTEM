@@ -3,18 +3,20 @@
 return [
 
     'company' => [
-        'legal_name' => 'Original Concepts',
+        'legal_name' => '',
         'trading_name' => 'Original Concepts',
-        'address_line1' => '',
-        'address_line2' => '',
-        'city' => '',
+        'address_line1' => '24 Henderson Road',
+        'address_line2' => 'Athlone',
+        'city' => 'Pietermaritzburg',
         'province' => '',
-        'postal_code' => '',
+        'postal_code' => '3201',
         'country' => 'South Africa',
         'vat_number' => '',
         'registration_number' => '',
-        'phone' => '',
-        'email' => 'support@originalconcepts.co.za',
+        'phone' => '+27 73 834 3781',
+        'email' => 'info@originalconcepts.co.za',
+        'website' => 'www.originalconcepts.co.za',
+        'bbbee' => 'B-BBEE Level 1',
         'bank_name' => '',
         'bank_account' => '',
         'branch_code' => '',
@@ -33,8 +35,8 @@ return [
     'pwa' => [
         'name' => 'Original Concepts Support',
         'short_name' => 'OC Support',
-        'theme_color' => '#1a3c5e',
-        'background_color' => '#1a3c5e',
+        'theme_color' => '#0b0f1a',
+        'background_color' => '#0b0f1a',
     ],
 
 ];

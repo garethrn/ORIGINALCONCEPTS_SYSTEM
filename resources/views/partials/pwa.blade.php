@@ -1,12 +1,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#1a3c5e">
+<meta name="theme-color" content="#0b0f1a">
 <meta name="robots" content="noindex, nofollow">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="OC Support">
 <link rel="manifest" href="{{ route('pwa.manifest') }}">
-<link rel="icon" href="/icons/icon-192.png" sizes="192x192" type="image/png">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/favicon-64.png" sizes="64x64" type="image/png">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon-180.png" sizes="180x180">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon-167.png" sizes="167x167">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon-152.png" sizes="152x152">

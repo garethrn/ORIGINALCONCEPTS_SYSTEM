@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Enums\ProductType;
 use App\Enums\VatCode;
 use App\Models\Product;
+use App\Models\Setting;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -23,6 +24,13 @@ class DatabaseSeeder extends Seeder
             ['sku' => 'PRT-PAGE', 'name' => 'Printing', 'type' => ProductType::Print, 'unit' => 'page', 'unit_price_cents' => 250],
             ['sku' => 'HW-CAM-4MP', 'name' => '4MP IP camera', 'type' => ProductType::Stock, 'unit' => 'each', 'unit_price_cents' => 145000],
         ];
+
+        foreach (config('support.company') as $key => $value) {
+            Setting::query()->firstOrCreate(
+                ['key' => $key],
+                ['value' => (string) $value, 'updated_at' => now()],
+            );
+        }
 
         foreach ($items as $item) {
             Product::query()->firstOrCreate(['sku' => $item['sku']], $item + [
