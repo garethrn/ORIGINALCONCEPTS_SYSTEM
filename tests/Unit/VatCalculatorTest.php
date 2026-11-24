@@ -39,6 +39,20 @@ class VatCalculatorTest extends TestCase
         $this->assertNotSame($zero->vatBasisPoints, 1500);
     }
 
+    public function test_negative_prices_carry_negative_vat(): void
+    {
+        $calculator = new VatCalculator;
+        $exclusive = $calculator->calculate('1', -10000, false, VatCode::Standard);
+        $inclusive = $calculator->calculate('1', -11500, true, VatCode::Standard);
+
+        $this->assertSame(-10000, $exclusive->netCents);
+        $this->assertSame(-1500, $exclusive->vatCents);
+        $this->assertSame(-11500, $exclusive->totalCents);
+        $this->assertSame(-10000, $inclusive->netCents);
+        $this->assertSame(-1500, $inclusive->vatCents);
+        $this->assertSame(-11500, $inclusive->totalCents);
+    }
+
     public function test_half_hours_round_half_up(): void
     {
         $line = (new VatCalculator)->calculate('1.5', 10000, false, VatCode::Standard);

@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Enums\CreditNoteStatus;
 use App\Enums\InvoiceStatus;
 use App\Enums\Role;
+use App\Services\Billing\InvoiceWorkLinks;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -25,6 +26,13 @@ class Invoice extends Model
             'issued_at' => 'datetime',
             'overdue_reminded_at' => 'datetime',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::deleting(function (Invoice $invoice): void {
+            app(InvoiceWorkLinks::class)->release($invoice->lines()->pluck('id'));
+        });
     }
 
     public function isDraft(): bool

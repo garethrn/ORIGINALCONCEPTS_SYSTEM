@@ -9,6 +9,7 @@ use App\Models\Invoice;
 use App\Models\User;
 use App\Services\Audit\AuditLogger;
 use App\Services\Billing\DocumentLineWriter;
+use App\Services\Billing\InvoiceWorkLinks;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -16,6 +17,7 @@ final class SaveDraftInvoice
 {
     public function __construct(
         private readonly DocumentLineWriter $lines,
+        private readonly InvoiceWorkLinks $links,
         private readonly AuditLogger $audit,
     ) {}
 
@@ -46,11 +48,40 @@ final class SaveDraftInvoice
             $invoice->vat_cents = $built['vat_cents'];
             $invoice->total_cents = $built['total_cents'];
             $invoice->save();
-            $invoice->lines()->delete();
-            $invoice->lines()->createMany($built['lines']);
+            $this->syncLines($invoice, $built['lines']);
             $this->audit->log($before ? 'invoice.draft_updated' : 'invoice.draft_created', $invoice, $before, $invoice->auditSnapshot(), $actor->id);
 
             return $invoice->load('lines', 'client');
         });
+    }
+
+    /**
+     * Update posted lines in place so ticket work stays attached to the same line.
+     * Links are released only for lines that were actually removed.
+     *
+     * @param  array<int, array<string, mixed>>  $lines
+     */
+    private function syncLines(Invoice $invoice, array $lines): void
+    {
+        $existing = $invoice->lines()->get()->keyBy('id');
+        $kept = [];
+
+        foreach ($lines as $line) {
+            $id = $line['source_id'] ?? null;
+            unset($line['source_id']);
+            if ($id && $existing->has($id) && ! isset($kept[$id])) {
+                $existing[$id]->update($line);
+                $kept[$id] = true;
+                continue;
+            }
+
+            $invoice->lines()->create($line);
+        }
+
+        $removed = $existing->keys()->reject(fn ($id) => isset($kept[(int) $id]))->values();
+        if ($removed->isNotEmpty()) {
+            $this->links->release($removed);
+            $invoice->lines()->whereIn('id', $removed)->delete();
+        }
     }
 }

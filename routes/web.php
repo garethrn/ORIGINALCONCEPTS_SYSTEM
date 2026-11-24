@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AssistantController;
+use App\Http\Controllers\BillingWizardController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
@@ -60,6 +61,8 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::put('/clients/{client}', [ClientController::class, 'update'])->name('clients.update');
     Route::post('/clients/{client}/contacts', [ClientController::class, 'storeContact'])->name('clients.contacts.store');
     Route::delete('/clients/{client}/contacts/{contact}', [ClientController::class, 'destroyContact'])->name('clients.contacts.destroy');
+    Route::get('/clients/{client}/bill', [BillingWizardController::class, 'client'])->name('clients.bill');
+    Route::post('/clients/{client}/bill', [BillingWizardController::class, 'storeClient'])->name('clients.bill.store');
     Route::post('/clients/{client}/sites', [ClientController::class, 'storeSite'])->name('clients.sites.store');
     Route::delete('/clients/{client}/sites/{site}', [ClientController::class, 'destroySite'])->name('clients.sites.destroy');
 
@@ -73,7 +76,8 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/tickets/{ticket}/attachments/{attachment}', [TicketController::class, 'download'])->name('tickets.attachments.download');
     Route::post('/tickets/{ticket}/time', [TicketController::class, 'time'])->name('tickets.time');
     Route::post('/tickets/{ticket}/parts', [TicketController::class, 'part'])->name('tickets.parts');
-    Route::post('/tickets/{ticket}/bill', [TicketController::class, 'bill'])->name('tickets.bill');
+    Route::get('/tickets/{ticket}/bill', [BillingWizardController::class, 'ticket'])->name('tickets.bill');
+    Route::post('/tickets/{ticket}/bill', [BillingWizardController::class, 'storeTicket'])->name('tickets.bill.store');
 
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');

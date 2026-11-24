@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use App\Models\Client;
+use App\Support\Money;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreClientRequest extends FormRequest
@@ -39,7 +40,32 @@ class StoreClientRequest extends FormRequest
             'country' => ['required', 'string', 'max:80'],
             'notes' => ['nullable', 'string', 'max:5000'],
             'is_active' => ['required', 'boolean'],
+            'labour_rate' => ['nullable', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'call_out_fee' => ['nullable', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'travel_rate' => ['nullable', 'regex:/^\d+(\.\d{1,2})?$/'],
         ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function clientAttributes(): array
+    {
+        $data = $this->validated();
+        foreach ([
+            'labour_rate' => 'labour_rate_cents',
+            'call_out_fee' => 'call_out_fee_cents',
+            'travel_rate' => 'travel_rate_cents',
+        ] as $input => $column) {
+            if (! array_key_exists($input, $data)) {
+                continue;
+            }
+            $raw = trim((string) ($data[$input] ?? ''));
+            $data[$column] = $raw === '' ? null : Money::randsToCents($raw);
+            unset($data[$input]);
+        }
+
+        return $data;
     }
 
     protected function prepareForValidation(): void

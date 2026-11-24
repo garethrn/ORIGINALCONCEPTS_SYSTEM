@@ -20,6 +20,9 @@
         <input class="field" name="postal_code" value="{{ old('postal_code', $client->postal_code) }}" placeholder="Postal code">
         <input class="field" name="country" value="{{ old('country', $client->country ?: 'South Africa') }}" placeholder="Country">
         <textarea class="field md:col-span-2" name="notes" rows="3" placeholder="Notes">{{ old('notes', $client->notes) }}</textarea>
+        <input class="field" name="labour_rate" value="{{ old('labour_rate', $client->labour_rate_cents !== null ? \App\Support\Money::centsToRands((int) $client->labour_rate_cents) : '') }}" placeholder="Labour rate override, blank for company rate">
+        <input class="field" name="call_out_fee" value="{{ old('call_out_fee', $client->call_out_fee_cents !== null ? \App\Support\Money::centsToRands((int) $client->call_out_fee_cents) : '') }}" placeholder="Call-out override, blank for company fee">
+        <input class="field" name="travel_rate" value="{{ old('travel_rate', $client->travel_rate_cents !== null ? \App\Support\Money::centsToRands((int) $client->travel_rate_cents) : '') }}" placeholder="Travel per km override, blank for company rate">
         <input type="hidden" name="is_active" value="0">
         <label class="text-sm"><input type="checkbox" name="is_active" value="1" @checked(old('is_active', $client->is_active))> Active</label>
         <div class="md:col-span-2"><button class="btn btn-primary" type="submit">Save customer</button></div>

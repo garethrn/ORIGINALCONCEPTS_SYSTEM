@@ -48,9 +48,29 @@ class SettingController extends Controller
             'branch_code' => ['nullable', 'string', 'max:20'],
             'invoice_footer' => ['nullable', 'string', 'max:500'],
             'default_labour_rate' => ['required', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'after_hours_multiplier' => ['required', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'call_out_fee' => ['required', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'minimum_billable_minutes' => ['required', 'integer', 'min:0', 'max:480'],
+            'rounding_minutes' => ['required', 'integer', 'in:1,5,15,30,60'],
+            'travel_rate' => ['required', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'standard_vat_percent' => ['required', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'show_prices_excl_vat' => ['nullable', 'boolean'],
+            'invoice_time_layout' => ['required', 'in:summary,detail'],
         ]);
+        if (bccomp($data['after_hours_multiplier'], '0', 2) !== 1) {
+            return back()->withErrors(['after_hours_multiplier' => 'The after-hours multiplier must be above zero.'])->withInput();
+        }
+        if ((float) $data['standard_vat_percent'] > 100) {
+            return back()->withErrors(['standard_vat_percent' => 'VAT must be 100% or less.'])->withInput();
+        }
         $data['default_labour_rate_cents'] = (string) Money::randsToCents($data['default_labour_rate']);
-        unset($data['default_labour_rate']);
+        $data['call_out_fee_cents'] = (string) Money::randsToCents($data['call_out_fee']);
+        $data['travel_rate_cents'] = (string) Money::randsToCents($data['travel_rate']);
+        $data['standard_vat_basis_points'] = (string) (int) round(((float) $data['standard_vat_percent']) * 100);
+        $data['show_prices_excl_vat'] = $request->boolean('show_prices_excl_vat') ? '1' : '0';
+        $data['minimum_billable_minutes'] = (string) (int) $data['minimum_billable_minutes'];
+        $data['rounding_minutes'] = (string) (int) $data['rounding_minutes'];
+        unset($data['default_labour_rate'], $data['call_out_fee'], $data['travel_rate'], $data['standard_vat_percent']);
         $company->update($data);
 
         return back()->with('status', 'Company settings saved.');

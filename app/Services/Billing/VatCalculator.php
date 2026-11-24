@@ -19,14 +19,13 @@ final class LineAmounts
 
 final class VatCalculator
 {
-    public function calculate(string $quantity, int $unitPriceCents, bool $includesVat, VatCode $vat): LineAmounts
+    public function calculate(string $quantity, int $unitPriceCents, bool $includesVat, VatCode $vat, ?int $basisPoints = null): LineAmounts
     {
         $quantity = $this->normalizeQuantity($quantity);
-        if ($unitPriceCents < 0) {
-            throw new InvalidArgumentException('Price cannot be negative.');
+        $basisPoints ??= $vat->basisPoints();
+        if ($basisPoints < 0) {
+            throw new InvalidArgumentException('VAT rate cannot be negative.');
         }
-
-        $basisPoints = $vat->basisPoints();
         $extended = $this->roundHalfUp(bcmul((string) $unitPriceCents, $quantity, 6));
 
         if ($includesVat) {

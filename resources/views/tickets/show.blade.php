@@ -69,15 +69,22 @@
         <div class="mt-4 grid gap-4 lg:grid-cols-2">
             <form method="POST" action="{{ route('tickets.time', $ticket) }}" class="space-y-2 rounded-2xl bg-white p-4 shadow-sm">
                 @csrf
-                <h2 class="font-semibold">Time</h2>
+                <h2 class="font-semibold">Time, labour, call-out, travel</h2>
                 <input class="field" type="date" name="work_date" value="{{ now()->toDateString() }}" required>
-                <input class="field" name="minutes" type="number" min="1" placeholder="Minutes" required>
+                <select class="field" name="kind">
+                    <option value="labour">Time / labour</option>
+                    <option value="call_out">Call-out</option>
+                    <option value="travel">Travel</option>
+                </select>
+                <input class="field" name="minutes" type="number" min="0" placeholder="Minutes (labour)">
+                <input class="field" name="quantity" inputmode="decimal" placeholder="Kilometres (travel)">
                 <input class="field" name="description" placeholder="What was done" required>
-                <input class="field" name="hourly_rate" placeholder="Hourly rate in rands, blank for default">
+                <input class="field" name="hourly_rate" placeholder="Rate in rands, blank for the default">
                 <input type="hidden" name="vat_code" value="standard">
-                <label class="text-sm"><input type="checkbox" name="billable" value="1" checked> Billable</label>
+                <label class="block text-sm"><input type="checkbox" name="after_hours" value="1"> After hours (labour is multiplied when billed)</label>
+                <label class="block text-sm"><input type="checkbox" name="billable" value="1" checked> Billable</label>
                 <button class="btn btn-ghost" type="submit">Log time</button>
-                <ul class="text-sm">@foreach ($ticket->timeEntries as $entry)<li>{{ $entry->minutes }} min · {{ $entry->description }} @if($entry->invoice_line_id) · billed @endif</li>@endforeach</ul>
+                <ul class="text-sm">@foreach ($ticket->timeEntries as $entry)<li>{{ $entry->kind?->label() ?? 'Labour' }} · {{ $entry->minutes }} min · {{ $entry->description }} @if($entry->invoice_line_id) · billed @endif</li>@endforeach</ul>
             </form>
             <form method="POST" action="{{ route('tickets.parts', $ticket) }}" class="space-y-2 rounded-2xl bg-white p-4 shadow-sm">
                 @csrf
@@ -92,7 +99,7 @@
             </form>
         </div>
         @can('bill', $ticket)
-            <form class="mt-4" method="POST" action="{{ route('tickets.bill', $ticket) }}">@csrf<button class="btn btn-primary" type="submit">Bill unbilled work onto a draft invoice</button></form>
+            <a class="btn btn-primary mt-4 inline-flex" href="{{ route('tickets.bill', $ticket) }}">Bill unbilled work</a>
         @endcan
     @endif
 @endsection

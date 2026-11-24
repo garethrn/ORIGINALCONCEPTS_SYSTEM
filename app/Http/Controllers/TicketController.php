@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\Tickets\AddTicketComment;
-use App\Actions\Tickets\BillTicketWork;
 use App\Actions\Tickets\CreateTicket;
 use App\Actions\Tickets\RecordPartUsed;
 use App\Actions\Tickets\RecordTimeEntry;
@@ -13,6 +12,7 @@ use App\Actions\Tickets\StoreTicketAttachment;
 use App\Actions\Tickets\TransitionTicket;
 use App\Enums\Role;
 use App\Enums\TicketStatus;
+use App\Enums\TimeEntryKind;
 use App\Enums\VatCode;
 use App\Http\Requests\StoreTicketRequest;
 use App\Models\Client;
@@ -21,6 +21,7 @@ use App\Models\TicketAttachment;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -146,13 +147,23 @@ class TicketController extends Controller
         $this->authorize('update', $ticket);
         $data = $request->validate([
             'work_date' => ['required', 'date'],
-            'minutes' => ['required', 'integer', 'min:1', 'max:1440'],
+            'kind' => ['required', Rule::enum(TimeEntryKind::class)],
+            'minutes' => ['nullable', 'integer', 'min:0', 'max:1440'],
+            'quantity' => ['nullable', 'regex:/^\d+(\.\d{1,3})?$/'],
             'description' => ['required', 'string', 'max:255'],
             'hourly_rate' => ['nullable', 'regex:/^\d+(\.\d{1,2})?$/'],
             'billable' => ['nullable', 'boolean'],
+            'after_hours' => ['nullable', 'boolean'],
             'vat_code' => ['required', Rule::enum(VatCode::class)],
         ]);
         $data['billable'] = $request->boolean('billable');
+        $data['after_hours'] = $request->boolean('after_hours');
+        if ($data['kind'] === TimeEntryKind::Labour->value && (int) ($data['minutes'] ?? 0) < 1) {
+            throw ValidationException::withMessages(['minutes' => 'Labour needs at least one minute.']);
+        }
+        if ($data['kind'] === TimeEntryKind::Travel->value && bccomp((string) ($data['quantity'] ?? '0'), '0', 3) !== 1) {
+            throw ValidationException::withMessages(['quantity' => 'Travel needs the kilometres.']);
+        }
         $action->handle($request->user(), $ticket, $data);
 
         return back()->with('status', 'Time recorded.');
@@ -175,13 +186,5 @@ class TicketController extends Controller
         $action->handle($request->user(), $ticket, $data);
 
         return back()->with('status', 'Part recorded.');
-    }
-
-    public function bill(Ticket $ticket, BillTicketWork $action): RedirectResponse
-    {
-        $this->authorize('bill', $ticket);
-        $invoice = $action->handle(request()->user(), $ticket);
-
-        return redirect()->route('invoices.show', $invoice)->with('status', 'Draft invoice created from unbilled work.');
     }
 }

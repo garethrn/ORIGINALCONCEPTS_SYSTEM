@@ -7,7 +7,42 @@
             <input class="field" name="{{ $key }}" value="{{ old($key, $company[$key] ?? '') }}" placeholder="{{ $label }}" @if(in_array($key, ['country', 'email'])) required @endif>
         @endforeach
         <textarea class="field md:col-span-2" name="invoice_footer" rows="2">{{ old('invoice_footer', $company['invoice_footer'] ?? '') }}</textarea>
-        <input class="field" name="default_labour_rate" value="{{ old('default_labour_rate', \App\Support\Money::centsToRands((int) ($company['default_labour_rate_cents'] ?? 65000))) }}" placeholder="Default labour rate (rands)" required>
+        <h2 class="md:col-span-2 mt-2 font-semibold">Billing defaults</h2>
+        <label class="text-sm">Standard labour rate, excl VAT
+            <input class="field" name="default_labour_rate" value="{{ old('default_labour_rate', \App\Support\Money::centsToRands((int) ($company['default_labour_rate_cents'] ?? 65000))) }}" required>
+        </label>
+        <label class="text-sm">After-hours multiplier
+            <input class="field" name="after_hours_multiplier" value="{{ old('after_hours_multiplier', $company['after_hours_multiplier'] ?? '1.5') }}" required>
+        </label>
+        <label class="text-sm">Call-out fee, excl VAT
+            <input class="field" name="call_out_fee" value="{{ old('call_out_fee', \App\Support\Money::centsToRands((int) ($company['call_out_fee_cents'] ?? 45000))) }}" required>
+        </label>
+        <label class="text-sm">Travel per km, excl VAT
+            <input class="field" name="travel_rate" value="{{ old('travel_rate', \App\Support\Money::centsToRands((int) ($company['travel_rate_cents'] ?? 650))) }}" required>
+        </label>
+        <label class="text-sm">Minimum billable minutes
+            <input class="field" name="minimum_billable_minutes" type="number" min="0" max="480" value="{{ old('minimum_billable_minutes', $company['minimum_billable_minutes'] ?? 30) }}" required>
+        </label>
+        <label class="text-sm">Round labour up to the next
+            <select class="field" name="rounding_minutes">
+                @foreach ([1, 5, 15, 30, 60] as $step)
+                    <option value="{{ $step }}" @selected(old('rounding_minutes', $company['rounding_minutes'] ?? 15) == $step)>{{ $step }} minutes</option>
+                @endforeach
+            </select>
+        </label>
+        @php $vatPercent = rtrim(rtrim(number_format(((int) ($company['standard_vat_basis_points'] ?? 1500)) / 100, 2, '.', ''), '0'), '.'); @endphp
+        <label class="text-sm">Standard VAT percent
+            <input class="field" name="standard_vat_percent" value="{{ old('standard_vat_percent', $vatPercent) }}" required>
+        </label>
+        <label class="text-sm">Time on invoices
+            <select class="field" name="invoice_time_layout">
+                <option value="summary" @selected(old('invoice_time_layout', $company['invoice_time_layout'] ?? 'summary') === 'summary')>Summary per ticket</option>
+                <option value="detail" @selected(old('invoice_time_layout', $company['invoice_time_layout'] ?? 'summary') === 'detail')>Each time entry</option>
+            </select>
+        </label>
+        <input type="hidden" name="show_prices_excl_vat" value="0">
+        <label class="flex items-center gap-2 text-sm md:col-span-2"><input type="checkbox" name="show_prices_excl_vat" value="1" @checked(old('show_prices_excl_vat', $company['show_prices_excl_vat'] ?? '1') !== '0')> Show line values exclusive of VAT, with a VAT line</label>
+        <p class="md:col-span-2 text-sm text-slate-500">Labour is rounded up, then the minimum is applied. Call-outs and travel do not use the minute minimum. A customer can override the labour, call-out, and travel rates.</p>
         <div class="md:col-span-2"><button class="btn btn-primary" type="submit">Save settings</button></div>
     </form>
     <section class="mt-4 rounded-2xl bg-white p-4 text-sm shadow-sm">

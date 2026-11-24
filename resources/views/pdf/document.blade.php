@@ -52,14 +52,15 @@
     @endif
 </p>
 <table>
-    <thead><tr><th>Description</th><th class="right">Qty</th><th class="right">Value</th><th>VAT</th><th class="right">VAT amount</th><th class="right">Total</th></tr></thead>
+    @php $showExcl = app(\App\Services\Billing\BillingSettings::class)->showPricesExclVat(); @endphp
+    <thead><tr><th>Description</th><th class="right">Qty</th><th class="right">{{ $showExcl ? 'Value' : 'Value (incl. VAT)' }}</th><th>VAT</th><th class="right">VAT amount</th><th class="right">Total</th></tr></thead>
     <tbody>
     @foreach ($document->lines as $line)
         <tr>
             <td>{{ $line->description }}@if($line->price_includes_vat) <span class="muted">(price incl. VAT)</span>@endif</td>
             <td class="right">{{ rtrim(rtrim((string) $line->quantity, '0'), '.') }}</td>
-            <td class="right">{{ \App\Support\Money::format($line->net_cents) }}</td>
-            <td>{{ $line->vat_code->shortLabel() }}</td>
+            <td class="right">{{ \App\Support\Money::format(app(\App\Services\Billing\BillingSettings::class)->showPricesExclVat() ? $line->net_cents : $line->total_cents) }}</td>
+            <td>{{ $line->vatLabel() }}</td>
             <td class="right">{{ \App\Support\Money::format($line->vat_cents) }}</td>
             <td class="right">{{ \App\Support\Money::format($line->total_cents) }}</td>
         </tr>
@@ -71,6 +72,17 @@
     <tr><td>VAT</td><td class="right">{{ \App\Support\Money::format($document->vat_cents) }}</td></tr>
     <tr><td><strong>Total</strong></td><td class="right"><strong>{{ \App\Support\Money::format($document->total_cents) }}</strong></td></tr>
 </table>
+@if ($kind === 'invoice')
+    @php $timeRows = app(\App\Services\Billing\InvoiceTimeSummary::class)->rows($document); @endphp
+    @if ($timeRows !== [])
+        <h2 style="font-size:14px;margin-top:18px;">Time summary</h2>
+        <table>
+            @foreach ($timeRows as $row)
+                <tr><td>{{ $row['label'] }}</td><td>{{ $row['detail'] }}</td></tr>
+            @endforeach
+        </table>
+    @endif
+@endif
 @if ($document->notes)<p>{{ $document->notes }}</p>@endif
 <p class="muted">{{ $profile['invoice_footer'] }}</p>
 @if (($profile['bank_name'] ?? '') !== '')

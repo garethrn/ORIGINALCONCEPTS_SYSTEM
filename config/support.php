@@ -22,6 +22,14 @@ return [
         'branch_code' => '',
         'invoice_footer' => 'Thank you for your business.',
         'default_labour_rate_cents' => '65000',
+        'after_hours_multiplier' => '1.5',
+        'call_out_fee_cents' => '45000',
+        'minimum_billable_minutes' => '30',
+        'rounding_minutes' => '15',
+        'travel_rate_cents' => '650',
+        'standard_vat_basis_points' => '1500',
+        'show_prices_excl_vat' => '1',
+        'invoice_time_layout' => 'summary',
     ],
 
     'ai' => [

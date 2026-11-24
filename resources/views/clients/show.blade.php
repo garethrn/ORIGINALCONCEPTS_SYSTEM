@@ -5,7 +5,10 @@
             <h1 class="text-2xl font-semibold text-oc-navy">{{ $client->displayName() }}</h1>
             <div class="text-sm text-slate-600">{{ $client->name }} · VAT {{ $client->vat_number ?: '—' }} · {{ $client->payment_terms_days }} day terms</div>
         </div>
-        @can('update', $client)<a class="btn btn-ghost" href="{{ route('clients.edit', $client) }}">Edit</a>@endcan
+        <div class="flex flex-wrap gap-2">
+            @can('create', App\Models\Invoice::class)<a class="btn btn-primary" href="{{ route('clients.bill', $client) }}">Bill unbilled work</a>@endcan
+            @can('update', $client)<a class="btn btn-ghost" href="{{ route('clients.edit', $client) }}">Edit</a>@endcan
+        </div>
     </div>
     <div class="grid gap-4 lg:grid-cols-2">
         <section class="rounded-2xl bg-white p-4 shadow-sm">

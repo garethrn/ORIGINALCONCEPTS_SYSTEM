@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'name', 'trading_name', 'email', 'phone', 'vat_number', 'registration_number',
     'payment_terms_days', 'address_line1', 'address_line2', 'city', 'province',
     'postal_code', 'country', 'notes', 'is_active',
+    'labour_rate_cents', 'call_out_fee_cents', 'travel_rate_cents',
 ])]
 class Client extends Model
 {

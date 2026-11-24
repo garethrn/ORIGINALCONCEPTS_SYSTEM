@@ -1,9 +1,12 @@
 <div data-line class="grid gap-2 rounded-xl border border-slate-200 p-3 md:grid-cols-12">
+    @if (! empty($line['id']))
+        <input type="hidden" name="lines[{{ $index }}][id]" value="{{ $line['id'] }}">
+    @endif
     <input class="field md:col-span-5" name="lines[{{ $index }}][description]" value="{{ $line['description'] ?? '' }}" placeholder="Description" required>
     <input class="field md:col-span-2" name="lines[{{ $index }}][quantity]" value="{{ $line['quantity'] ?? '1' }}" inputmode="decimal" required>
-    <input class="field md:col-span-2" name="lines[{{ $index }}][unit_price]" value="{{ $line['unit_price'] ?? '0.00' }}" inputmode="decimal" required>
+    <input class="field md:col-span-2" name="lines[{{ $index }}][unit_price]" value="{{ $line['unit_price'] ?? '0.00' }}" inputmode="decimal" placeholder="Unit price, negative for a discount" required>
     <select class="field md:col-span-2" name="lines[{{ $index }}][vat_code]">
-        @foreach (['standard' => 'VAT 15%', 'zero' => 'Zero-rated', 'exempt' => 'Exempt'] as $value => $label)
+        @foreach (['standard' => 'Standard VAT', 'zero' => 'Zero-rated', 'exempt' => 'Exempt'] as $value => $label)
             <option value="{{ $value }}" @selected(($line['vat_code'] ?? 'standard') === $value)>{{ $label }}</option>
         @endforeach
     </select>

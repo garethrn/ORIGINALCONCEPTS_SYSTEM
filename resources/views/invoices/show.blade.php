@@ -1,5 +1,9 @@
 @extends('layouts.app')
-@php $company = app(\App\Services\Billing\CompanyProfile::class); @endphp
+@php
+    $company = app(\App\Services\Billing\CompanyProfile::class);
+    $showExcl = app(\App\Services\Billing\BillingSettings::class)->showPricesExclVat();
+    $timeRows = app(\App\Services\Billing\InvoiceTimeSummary::class)->rows($invoice);
+@endphp
 @section('content')
     <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h1 class="text-2xl font-semibold text-oc-navy">{{ $invoice->isDraft() ? 'Draft invoice' : 'Tax Invoice' }} {{ $invoice->number }}</h1>
@@ -21,10 +25,10 @@
     </div>
     <div class="mt-4 overflow-x-auto rounded-2xl bg-white shadow-sm">
         <table class="min-w-full text-sm">
-            <thead class="bg-slate-50 text-left text-xs uppercase text-slate-500"><tr><th class="px-4 py-2">Description</th><th class="px-4 py-2">Qty</th><th class="px-4 py-2">Value</th><th class="px-4 py-2">VAT</th><th class="px-4 py-2">Total</th></tr></thead>
+            <thead class="bg-slate-50 text-left text-xs uppercase text-slate-500"><tr><th class="px-4 py-2">Description</th><th class="px-4 py-2">Qty</th><th class="px-4 py-2">{{ $showExcl ? 'Value' : 'Value (incl. VAT)' }}</th><th class="px-4 py-2">VAT</th><th class="px-4 py-2">Total</th></tr></thead>
             <tbody>
             @foreach ($invoice->lines as $line)
-                <tr class="border-t"><td class="px-4 py-3">{{ $line->description }}</td><td class="px-4 py-3">{{ $line->quantity }}</td><td class="px-4 py-3">{{ \App\Support\Money::format($line->net_cents) }}</td><td class="px-4 py-3">{{ $line->vat_code->shortLabel() }} {{ \App\Support\Money::format($line->vat_cents) }}</td><td class="px-4 py-3">{{ \App\Support\Money::format($line->total_cents) }}</td></tr>
+                <tr class="border-t"><td class="px-4 py-3">{{ $line->description }}</td><td class="px-4 py-3">{{ $line->quantity }}</td><td class="px-4 py-3">{{ \App\Support\Money::format($showExcl ? $line->net_cents : $line->total_cents) }}</td><td class="px-4 py-3">{{ $line->vatLabel() }} {{ \App\Support\Money::format($line->vat_cents) }}</td><td class="px-4 py-3">{{ \App\Support\Money::format($line->total_cents) }}</td></tr>
             @endforeach
             </tbody>
         </table>
@@ -35,7 +39,20 @@
             @unless($invoice->isDraft())<div>Balance {{ \App\Support\Money::format($invoice->balanceCents()) }}</div>@endunless
         </div>
     </div>
+    @if ($timeRows !== [])
+        <section class="mt-4 rounded-2xl bg-white p-4 shadow-sm">
+            <h2 class="mb-2 font-semibold">Time summary</h2>
+            <ul class="space-y-1 text-sm">
+                @foreach ($timeRows as $row)
+                    <li><span class="font-medium">{{ $row['label'] }}</span> · {{ $row['detail'] }}</li>
+                @endforeach
+            </ul>
+        </section>
+    @endif
     <div class="mt-4 text-sm text-slate-600">Serial {{ $invoice->number ?: 'assigned on issue' }} · Date {{ optional($invoice->issue_date)->format('d M Y') ?: '—' }} · Due {{ optional($invoice->due_date)->format('d M Y') ?: '—' }}</div>
+    @unless ($invoice->isDraft())
+        <p class="mt-2 text-sm text-slate-600">This invoice is locked. Corrections are made with a credit note.</p>
+    @endunless
     <div class="mt-4 flex flex-wrap gap-2">
         @can('update', $invoice)<a class="btn btn-ghost" href="{{ route('invoices.edit', $invoice) }}">Edit draft</a>@endcan
         @can('issue', $invoice)

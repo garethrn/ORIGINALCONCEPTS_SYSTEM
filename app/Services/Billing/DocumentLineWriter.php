@@ -24,14 +24,19 @@ final class DocumentLineWriter
 
         foreach (array_values($lines) as $index => $line) {
             $code = $line['vat_code'] instanceof VatCode ? $line['vat_code'] : VatCode::from((string) $line['vat_code']);
+            $basisPoints = $code === VatCode::Standard
+                ? app(BillingSettings::class)->standardVatBasisPoints()
+                : $code->basisPoints();
             $amounts = $this->vat->calculate(
                 (string) $line['quantity'],
                 Money::randsToCents((string) $line['unit_price']),
                 (bool) $line['includes_vat'],
                 $code,
+                $basisPoints,
             );
 
             $written[] = [
+                'source_id' => isset($line['id']) && $line['id'] !== '' ? (int) $line['id'] : null,
                 'product_id' => $line['product_id'] ?? null,
                 'description' => trim((string) $line['description']),
                 'quantity' => $this->vat->normalizeQuantity((string) $line['quantity']),

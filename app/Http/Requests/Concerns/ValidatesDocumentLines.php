@@ -18,12 +18,13 @@ trait ValidatesDocumentLines
         return [
             'lines' => ['required', 'array', 'min:1', 'max:50'],
             'lines.*.description' => ['required', 'string', 'max:500'],
+            'lines.*.id' => ['nullable', 'integer'],
             'lines.*.quantity' => ['required', 'regex:/^\d+(\.\d{1,3})?$/', function (string $attribute, mixed $value, \Closure $fail): void {
                 if (bccomp((string) $value, '0', 3) !== 1) {
                     $fail('Quantity must be greater than zero.');
                 }
             }],
-            'lines.*.unit_price' => ['required', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'lines.*.unit_price' => ['required', 'regex:/^-?\d+(\.\d{1,2})?$/'],
             'lines.*.includes_vat' => ['required', 'boolean'],
             'lines.*.vat_code' => ['required', Rule::enum(VatCode::class)],
             'lines.*.product_id' => ['nullable', 'integer', 'exists:products,id'],

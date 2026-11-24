@@ -22,4 +22,15 @@ trait HasDocumentLines
     {
         return Money::centsToRands((int) $this->unit_price_cents);
     }
+
+    public function vatLabel(): string
+    {
+        if ($this->vat_code === VatCode::Standard) {
+            $text = rtrim(rtrim(number_format(((int) $this->vat_basis_points) / 100, 2, '.', ''), '0'), '.');
+
+            return $text.'%';
+        }
+
+        return $this->vat_code->shortLabel();
+    }
 }

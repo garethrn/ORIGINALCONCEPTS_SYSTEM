@@ -43,7 +43,7 @@ class ClientController extends Controller
 
     public function store(StoreClientRequest $request, AuditLogger $audit): RedirectResponse
     {
-        $client = Client::query()->create($request->validated());
+        $client = Client::query()->create($request->clientAttributes());
         $audit->log('client.created', $client, null, ['name' => $client->name]);
 
         return redirect()->route('clients.show', $client)->with('status', 'Customer saved.');
@@ -67,7 +67,7 @@ class ClientController extends Controller
     public function update(StoreClientRequest $request, Client $client, AuditLogger $audit): RedirectResponse
     {
         $before = $client->only(['name', 'vat_number', 'payment_terms_days', 'is_active']);
-        $client->update($request->validated());
+        $client->update($request->clientAttributes());
         $audit->log('client.updated', $client, $before, $client->only(['name', 'vat_number', 'payment_terms_days', 'is_active']));
 
         return redirect()->route('clients.show', $client)->with('status', 'Customer updated.');

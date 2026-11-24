@@ -4,6 +4,7 @@
     if (! is_array($lines)) {
         $lines = $document->exists
             ? $document->lines->map(fn ($line) => [
+                'id' => $line->id,
                 'description' => $line->description,
                 'quantity' => rtrim(rtrim((string) $line->quantity, '0'), '.') ?: '0',
                 'unit_price' => $line->unitPriceRands(),

@@ -21,14 +21,19 @@ final class Money
     public static function randsToCents(string $rands): int
     {
         $rands = trim($rands);
+        $negative = str_starts_with($rands, '-');
+        if ($negative) {
+            $rands = substr($rands, 1);
+        }
         if (! preg_match('/^\d+(\.\d{1,2})?$/', $rands)) {
             throw new InvalidArgumentException('Amount must be a rand value with up to two decimals.');
         }
 
         [$whole, $frac] = array_pad(explode('.', $rands, 2), 2, '0');
         $frac = str_pad(substr($frac, 0, 2), 2, '0');
+        $cents = ((int) $whole) * 100 + (int) $frac;
 
-        return ((int) $whole) * 100 + (int) $frac;
+        return $negative ? -$cents : $cents;
     }
 
     public static function centsToRands(int $cents): string
