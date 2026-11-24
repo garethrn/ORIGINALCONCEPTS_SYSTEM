@@ -27,3 +27,6 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Machine-specific Compose file (Caddy network, and similar). See docker-compose.override.example.yml.
+/docker-compose.override.yml

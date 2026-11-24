@@ -2,6 +2,8 @@
 
 This app is a Docker Compose project named `oc-support`. It publishes **127.0.0.1:8085** only. It does not bind ports 80 or 443, and the scripts below always pass `-p oc-support`, so they do not stop or rebuild other containers.
 
+`deploy/update.sh` and `deploy/backup.sh` always use `-f docker-compose.prod.yml`. If `docker-compose.override.yml` is in the repository root, they add `-f docker-compose.override.yml` as well, including for `php artisan migrate --force`. Copy `docker-compose.override.example.yml` to that name when the app must join an external Docker network (the Caddy proxy on this VPS). The real override file is gitignored. Without it, Compose only publishes `127.0.0.1:8085` for nginx or Apache on the host.
+
 The database is MySQL 8 on an internal Docker network. It has no host port. Uploads live in the named volume `oc-support-storage`. The database lives in `oc-support-mysql`.
 
 ## Pre-flight (read only)
@@ -37,7 +39,7 @@ bash deploy/update.sh
 
 That builds the image, starts `app`, `queue`, `scheduler`, and `mysql`, and runs migrations.
 
-Create the first administrator. The password is typed into the terminal or passed for that one process, then forgotten:
+Create the first administrator. The password is typed into the terminal or passed for that one process, then forgotten. Use the same Compose files as the scripts: `-f docker-compose.prod.yml`, and `-f docker-compose.override.yml` as well when that file exists.
 
 ```bash
 docker compose -p oc-support -f docker-compose.prod.yml exec -it app php artisan app:create-admin
@@ -78,7 +80,29 @@ sudo certbot --apache -d support.originalconcepts.co.za
 
 Do not expand the certificate to the other names on the server. After HTTPS works, requests arrive with `X-Forwarded-Proto`. The app trusts the local proxy (`TRUSTED_PROXIES=*`) because nothing else can reach the published port.
 
-Health: `curl -fsS http://127.0.0.1:8085/health` returns `{"status":"ok"}` when the app can see its database.
+### Caddy
+
+When the reverse proxy is Caddy running in Docker, copy `docker-compose.override.example.yml` to `docker-compose.override.yml` so the app joins the proxy network `ormsa-bot_default` with the alias `oc-support-app`. Then add this site block and leave every other site as it is:
+
+```
+support.originalconcepts.co.za {
+    encode gzip
+    reverse_proxy oc-support-app-1:8080
+}
+```
+
+`oc-support-app-1` is the Compose container name (project `oc-support`, service `app`). The alias `oc-support-app` is on the same network if you prefer a name that does not include the replica number.
+
+Validate the Caddyfile, then reload Caddy. Do not restart the shared proxy (`docker restart`, `systemctl restart`, or `caddy stop` would drop the other sites):
+
+```bash
+caddy validate --config /etc/caddy/Caddyfile
+caddy reload --config /etc/caddy/Caddyfile
+```
+
+If Caddy itself is a container, run those two commands with `docker exec` against that existing container. Still do not restart it.
+
+Health: `curl -fsS http://127.0.0.1:8085/health` returns `{"status":"ok"}` when the app can see its database. When traffic arrives only through Caddy, check `https://support.originalconcepts.co.za/health` instead. The app container still listens on port 8080.
 
 ## Updates
 
@@ -88,7 +112,7 @@ git pull
 bash deploy/update.sh
 ```
 
-`update.sh` builds, recreates the oc-support services, runs `php artisan migrate --force`, refreshes the framework cache, and restarts queue workers. It does not prune Docker and it does not name any other project.
+`update.sh` builds, recreates the oc-support services, runs `php artisan migrate --force` with the same Compose files, refreshes the framework cache, and restarts queue workers. It does not prune Docker and it does not name any other project. If `docker-compose.override.yml` is present, that file is included.
 
 ## Backups
 
@@ -102,7 +126,9 @@ A daily cron that only dumps this database:
 15 2 * * * cd /opt/oc-support && bash deploy/backup.sh /var/backups/oc-support
 ```
 
-Keep a copy off the VPS. Restoring is a `gunzip` into `docker compose -p oc-support exec -T mysql mysql ...` for this database only.
+The dump uses `--single-transaction` and `--no-tablespaces`, so the app database user does not need the PROCESS privilege. The password is passed to `mysqldump` with `MYSQL_PWD` inside the container, not on the command line. `backup.sh` uses the same Compose files as `update.sh`, including the override when it exists.
+
+Keep a copy off the VPS. Restoring is a `gunzip` into `docker compose -p oc-support -f docker-compose.prod.yml exec -T mysql mysql ...` for this database only. Add `-f docker-compose.override.yml` when that file exists.
 
 ## Environment variables
 

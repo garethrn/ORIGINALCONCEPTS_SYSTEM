@@ -4,13 +4,19 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+# shellcheck source=compose.sh
+source "${ROOT}/deploy/compose.sh"
+
 DEST="${1:-/var/backups/oc-support}"
 mkdir -p "$DEST"
 STAMP="$(date +%F-%H%M)"
 TARGET="${DEST}/oc-support-${STAMP}.sql.gz"
 
-docker compose -p oc-support -f docker-compose.prod.yml exec -T mysql \
-    sh -c 'mysqldump --single-transaction --quick -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE"' \
+# MYSQL_PASSWORD is already in the mysql container. MYSQL_PWD is set only for
+# this mysqldump process so the password is not placed on its command line.
+# --no-tablespaces avoids the PROCESS privilege the app user does not have.
+"${COMPOSE[@]}" exec -T mysql \
+    sh -c 'MYSQL_PWD="$MYSQL_PASSWORD" mysqldump --single-transaction --quick --no-tablespaces -u"$MYSQL_USER" "$MYSQL_DATABASE"' \
     | gzip > "$TARGET"
 
 echo "Wrote ${TARGET}"

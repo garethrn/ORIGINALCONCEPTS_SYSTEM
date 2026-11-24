@@ -12,12 +12,22 @@ if ! grep -q '^name: oc-support$' "$FILE"; then
     exit 1
 fi
 
-if grep -Eq '0\.0\.0\.0:' "$FILE"; then
-    echo "Refusing to run: ${FILE} publishes a port on all interfaces." >&2
+port_files=("$FILE")
+if [[ -f docker-compose.override.yml ]]; then
+    port_files+=(docker-compose.override.yml)
+fi
+if grep -Eq '0\.0\.0\.0:' "${port_files[@]}"; then
+    echo "Refusing to run: a compose file publishes a port on all interfaces." >&2
     exit 1
 fi
 
-COMPOSE=(docker compose -p "$PROJECT" -f "$FILE")
+# shellcheck source=compose.sh
+source "${ROOT}/deploy/compose.sh"
+
+if [[ "${COMPOSE[*]}" != *" -p ${PROJECT} "* ]]; then
+    echo "Refusing to run: compose project is not ${PROJECT}." >&2
+    exit 1
+fi
 
 "${COMPOSE[@]}" build
 "${COMPOSE[@]}" up -d

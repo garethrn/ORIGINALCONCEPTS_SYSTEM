@@ -38,7 +38,7 @@ php artisan app:create-admin
 
 ## Deploy
 
-See [docs/DEPLOY.md](docs/DEPLOY.md). The production compose project is named `oc-support` and listens only on `127.0.0.1:8085`.
+See [docs/DEPLOY.md](docs/DEPLOY.md). The production compose project is named `oc-support` and listens only on `127.0.0.1:8085`. If `docker-compose.override.yml` is present, `deploy/update.sh` and `deploy/backup.sh` include it (used to join the Caddy network). A sample is `docker-compose.override.example.yml`.
 
 ## Layout
 
