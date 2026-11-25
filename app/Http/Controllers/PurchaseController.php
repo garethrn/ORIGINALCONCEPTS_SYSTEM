@@ -101,6 +101,56 @@ class PurchaseController extends Controller
         return back()->with('status', 'Bill issued and posted to the ledger.');
     }
 
+    public function payBill(Bill $bill, Ledger $ledger): RedirectResponse
+    {
+        $this->guard();
+        if ($bill->isDraft() || $bill->status === 'paid') {
+            return back()->with('error', 'Only an open bill can be paid.');
+        }
+        $bank = Account::forRole('bank');
+        $lines = [
+            [
+                'account_id' => Account::forRole('payable')->id,
+                'debit_cents' => (int) $bill->total_cents,
+                'credit_cents' => 0,
+                'description' => 'Payment of '.$bill->number,
+                'client_id' => null,
+                'supplier_id' => $bill->supplier_id,
+            ],
+            [
+                'account_id' => $bank->id,
+                'debit_cents' => 0,
+                'credit_cents' => (int) $bill->total_cents,
+                'description' => 'Payment of '.$bill->number,
+                'client_id' => null,
+                'supplier_id' => $bill->supplier_id,
+            ],
+        ];
+        if (app(\App\Services\Billing\BillingSettings::class)->vatBasis() === 'cash' && (int) $bill->vat_cents !== 0) {
+            $lines[] = [
+                'account_id' => Account::forRole('vat_input')->id,
+                'debit_cents' => (int) $bill->vat_cents,
+                'credit_cents' => 0,
+                'description' => null,
+                'client_id' => null,
+                'supplier_id' => $bill->supplier_id,
+            ];
+            $lines[] = [
+                'account_id' => Account::forRole('vat_input_deferred')->id,
+                'debit_cents' => 0,
+                'credit_cents' => (int) $bill->vat_cents,
+                'description' => null,
+                'client_id' => null,
+                'supplier_id' => $bill->supplier_id,
+            ];
+        }
+        $ledger->post('supplier_payment', $bill->id, today()->toDateString(), 'Payment of '.$bill->number, $lines, request()->user()->id);
+        $bill->status = 'paid';
+        $bill->save();
+
+        return back()->with('status', 'Bill paid and posted.');
+    }
+
     public function storeExpense(Request $request, VatCalculator $vat, DocumentNumberer $numbers, Ledger $ledger): RedirectResponse
     {
         $this->guard();

@@ -17,6 +17,7 @@
         ['Recurring', route('recurring.index'), $user->role->canBill()],
         ['Payments', route('payments.index'), $user->role->canTakePayment()],
         ['Debtors', route('debtors.index'), $user->role->canBill()],
+        ['Reports', route('reports.index'), $user->role->canBill()],
         ['Accounts', route('accounts.index'), $user->role->canBill()],
         ['Banking', route('banking.index'), $user->role->canBill()],
         ['Suppliers', route('suppliers.index'), $user->role->canBill()],

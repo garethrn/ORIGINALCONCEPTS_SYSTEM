@@ -35,6 +35,8 @@
             <li class="rounded-2xl bg-white p-3 shadow-sm">{{ $bill->number ?: 'Draft' }} · {{ \App\Support\Money::format($bill->total_cents) }}
                 @if ($bill->isDraft())
                     <form class="inline" method="POST" action="{{ route('bills.issue', $bill) }}">@csrf<button class="btn btn-ghost" type="submit">Issue</button></form>
+                @elseif ($bill->status === 'open')
+                    <form class="inline" method="POST" action="{{ route('bills.pay', $bill) }}">@csrf<button class="btn btn-ghost" type="submit">Pay from the bank</button></form>
                 @endif
             </li>
         @endforeach

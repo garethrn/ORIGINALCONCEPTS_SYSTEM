@@ -21,6 +21,7 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PwaController;
 use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RecurringScheduleController;
 use App\Http\Controllers\StatementController;
 use App\Http\Controllers\SettingController;
@@ -141,6 +142,10 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/payments/{payment}', [PaymentController::class, 'show'])->name('payments.show');
     Route::get('/debtors', DebtorController::class)->name('debtors.index');
 
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/transactions', [ReportController::class, 'drill'])->name('reports.drill');
+    Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
+
     Route::get('/accounts', [AccountController::class, 'index'])->name('accounts.index');
     Route::get('/accounts/create', [AccountController::class, 'create'])->name('accounts.create');
     Route::post('/accounts', [AccountController::class, 'store'])->name('accounts.store');
@@ -164,6 +169,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/suppliers/{supplier}', [PurchaseController::class, 'show'])->name('suppliers.show');
     Route::post('/suppliers/{supplier}/bills', [PurchaseController::class, 'storeBill'])->name('bills.store');
     Route::post('/bills/{bill}/issue', [PurchaseController::class, 'issueBill'])->name('bills.issue');
+    Route::post('/bills/{bill}/pay', [PurchaseController::class, 'payBill'])->name('bills.pay');
     Route::post('/expenses', [PurchaseController::class, 'storeExpense'])->name('expenses.store');
 
     Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');

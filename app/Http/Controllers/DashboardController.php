@@ -8,6 +8,7 @@ use App\Enums\InvoiceStatus;
 use App\Enums\TicketStatus;
 use App\Models\Invoice;
 use App\Models\Ticket;
+use App\Services\Accounting\ReportCentre;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -38,6 +39,8 @@ class DashboardController extends Controller
             }
         }
 
-        return view('dashboard', compact('open', 'mine', 'recent', 'outstanding', 'overdue'));
+        $figures = $user->role->canBill() ? app(ReportCentre::class)->dashboard() : null;
+
+        return view('dashboard', compact('open', 'mine', 'recent', 'outstanding', 'overdue', 'figures'));
     }
 }

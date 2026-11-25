@@ -6,6 +6,14 @@
         <div class="stat-card rounded-2xl bg-white p-4"><div class="text-xs uppercase tracking-wide">Assigned to me</div><div class="text-3xl font-semibold">{{ $mine }}</div></div>
         <div class="stat-card rounded-2xl bg-white p-4"><div class="text-xs uppercase tracking-wide">Outstanding</div><div class="text-3xl font-semibold">{{ \App\Support\Money::format($outstanding) }}</div></div>
         <div class="stat-card rounded-2xl bg-white p-4"><div class="text-xs uppercase tracking-wide">Overdue invoices</div><div class="text-3xl font-semibold">{{ $overdue }}</div></div>
+        @if ($figures)
+            <a class="stat-card rounded-2xl bg-white p-4" href="{{ route('reports.show', 'profit-and-loss') }}"><div class="text-xs uppercase tracking-wide">Income this month</div><div class="text-3xl font-semibold">{{ \App\Support\Money::format($figures['income_cents']) }}</div></a>
+            <a class="stat-card rounded-2xl bg-white p-4" href="{{ route('reports.show', 'profit-and-loss') }}"><div class="text-xs uppercase tracking-wide">Expenses this month</div><div class="text-3xl font-semibold">{{ \App\Support\Money::format($figures['expense_cents']) }}</div></a>
+            <a class="stat-card rounded-2xl bg-white p-4" href="{{ route('reports.show', 'profit-and-loss') }}"><div class="text-xs uppercase tracking-wide">Net profit</div><div class="text-3xl font-semibold">{{ \App\Support\Money::format($figures['profit_cents']) }}</div></a>
+            @foreach ($figures['banks'] as $bank)
+                <a class="stat-card rounded-2xl bg-white p-4" href="{{ route('banking.index') }}"><div class="text-xs uppercase tracking-wide">{{ $bank['name'] }}</div><div class="text-3xl font-semibold">{{ \App\Support\Money::format($bank['cents']) }}</div></a>
+            @endforeach
+        @endif
     </div>
     <div class="mt-6 overflow-hidden rounded-2xl bg-white shadow-sm">
         <div class="flex items-center justify-between px-4 py-3"><h2 class="font-semibold">Recent tickets</h2><a class="btn btn-gold" href="{{ route('tickets.create') }}">New ticket</a></div>
