@@ -33,6 +33,9 @@ class StoreQuoteRequest extends FormRequest
             'ticket_id' => ['nullable', 'integer', Rule::exists('tickets', 'id')->where('client_id', (int) $this->input('client_id'))],
             'valid_until' => ['nullable', 'date'],
             'notes' => ['nullable', 'string', 'max:2000'],
+            'options' => ['nullable', 'array', 'max:8'],
+            'options.*.name' => ['nullable', 'string', 'max:80'],
+            'lines.*.placement' => ['nullable', 'string', 'max:20'],
         ], $this->documentLineRules());
     }
 

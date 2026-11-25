@@ -13,5 +13,14 @@
     <input type="hidden" name="lines[{{ $index }}][includes_vat]" value="0">
     <label class="flex items-center gap-2 text-sm md:col-span-12"><input type="checkbox" name="lines[{{ $index }}][includes_vat]" value="1" @checked($line['includes_vat'] ?? false)> Price includes VAT</label>
     <input type="hidden" name="lines[{{ $index }}][product_id]" value="{{ $line['product_id'] ?? '' }}">
+    @if (($kind ?? '') === 'quote')
+        <select class="field md:col-span-6" name="lines[{{ $index }}][placement]">
+            <option value="included" @selected(($line['placement'] ?? 'included') === 'included')>Included with every option</option>
+            <option value="optional" @selected(($line['placement'] ?? '') === 'optional')>Optional add-on</option>
+            @foreach ($optionRows ?? [] as $optionIndex => $option)
+                <option value="option-{{ $optionIndex }}" @selected(($line['placement'] ?? '') === 'option-'.$optionIndex)>{{ ($option['name'] ?? '') !== '' ? $option['name'] : 'Option '.($optionIndex + 1) }}</option>
+            @endforeach
+        </select>
+    @endif
     <button class="text-left text-sm text-red-700 md:col-span-12" type="button" data-remove-line>Remove line</button>
 </div>

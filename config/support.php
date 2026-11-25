@@ -30,6 +30,7 @@ return [
         'standard_vat_basis_points' => '1500',
         'show_prices_excl_vat' => '1',
         'invoice_time_layout' => 'summary',
+        'fiscal_year_start_month' => '3',
     ],
 
     'ai' => [

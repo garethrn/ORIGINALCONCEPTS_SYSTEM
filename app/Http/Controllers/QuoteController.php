@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Actions\Billing\ChooseQuoteOption;
 use App\Actions\Billing\ConvertQuoteToInvoice;
 use App\Actions\Billing\EmailDocument;
 use App\Actions\Billing\IssueQuote;
@@ -46,7 +47,7 @@ class QuoteController extends Controller
     public function show(Quote $quote): View
     {
         $this->authorize('view', $quote);
-        $quote->load('client', 'lines', 'contact');
+        $quote->load('client', 'lines.option', 'options', 'contact', 'selectedOption');
 
         return view('quotes.show', compact('quote'));
     }
@@ -54,7 +55,7 @@ class QuoteController extends Controller
     public function edit(Quote $quote): View
     {
         $this->authorize('update', $quote);
-        $quote->load('lines');
+        $quote->load('lines', 'options');
 
         return view('documents.form', $this->formData($quote));
     }
@@ -92,6 +93,19 @@ class QuoteController extends Controller
         $audit->log('quote.'.$quote->status->value, $quote);
 
         return back()->with('status', 'Quote marked '.$quote->status->label().'.');
+    }
+
+    public function choose(Request $request, Quote $quote, ChooseQuoteOption $action): RedirectResponse
+    {
+        $this->authorize('accept', $quote);
+        $data = $request->validate([
+            'option_id' => ['nullable', 'integer'],
+            'optional_lines' => ['nullable', 'array'],
+            'optional_lines.*' => ['integer'],
+        ]);
+        $action->handle($request->user(), $quote, isset($data['option_id']) ? (int) $data['option_id'] : null, $data['optional_lines'] ?? []);
+
+        return back()->with('status', 'Option saved. The quote is accepted.');
     }
 
     public function convert(Quote $quote, ConvertQuoteToInvoice $action): RedirectResponse

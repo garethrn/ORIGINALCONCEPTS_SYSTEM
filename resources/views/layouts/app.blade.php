@@ -14,6 +14,7 @@
         ['Customers', route('clients.index'), $user->isStaff()],
         ['Quotes', route('quotes.index'), $user->role->canBill() || $user->role->value === 'client'],
         ['Invoices', route('invoices.index'), $user->role->canBill() || $user->role->value === 'client'],
+        ['Recurring', route('recurring.index'), $user->role->canBill()],
         ['Payments', route('payments.index'), $user->role->canTakePayment()],
         ['Debtors', route('debtors.index'), $user->role->canBill()],
         ['Catalogue', route('products.index'), $user->isStaff()],

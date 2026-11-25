@@ -56,6 +56,7 @@ class SettingController extends Controller
             'standard_vat_percent' => ['required', 'regex:/^\d+(\.\d{1,2})?$/'],
             'show_prices_excl_vat' => ['nullable', 'boolean'],
             'invoice_time_layout' => ['required', 'in:summary,detail'],
+            'fiscal_year_start_month' => ['nullable', 'integer', 'min:1', 'max:12'],
         ]);
         if (bccomp($data['after_hours_multiplier'], '0', 2) !== 1) {
             return back()->withErrors(['after_hours_multiplier' => 'The after-hours multiplier must be above zero.'])->withInput();
@@ -68,6 +69,7 @@ class SettingController extends Controller
         $data['travel_rate_cents'] = (string) Money::randsToCents($data['travel_rate']);
         $data['standard_vat_basis_points'] = (string) (int) round(((float) $data['standard_vat_percent']) * 100);
         $data['show_prices_excl_vat'] = $request->boolean('show_prices_excl_vat') ? '1' : '0';
+        $data['fiscal_year_start_month'] = (string) (int) ($data['fiscal_year_start_month'] ?? $company->get('fiscal_year_start_month', '3'));
         $data['minimum_billable_minutes'] = (string) (int) $data['minimum_billable_minutes'];
         $data['rounding_minutes'] = (string) (int) $data['rounding_minutes'];
         unset($data['default_labour_rate'], $data['call_out_fee'], $data['travel_rate'], $data['standard_vat_percent']);

@@ -7,6 +7,7 @@
         </div>
         <div class="flex flex-wrap gap-2">
             @can('create', App\Models\Invoice::class)<a class="btn btn-primary" href="{{ route('clients.bill', $client) }}">Bill unbilled work</a>@endcan
+            @can('view', $client)<a class="btn btn-ghost" href="{{ route('clients.statement', $client) }}">Statement</a>@endcan
             @can('update', $client)<a class="btn btn-ghost" href="{{ route('clients.edit', $client) }}">Edit</a>@endcan
         </div>
     </div>

@@ -50,6 +50,16 @@ class Quote extends Model
         return $this->hasMany(QuoteLine::class)->orderBy('sort_order');
     }
 
+    public function options(): HasMany
+    {
+        return $this->hasMany(QuoteOption::class)->orderBy('sort_order');
+    }
+
+    public function selectedOption(): BelongsTo
+    {
+        return $this->belongsTo(QuoteOption::class, 'selected_option_id');
+    }
+
     public function scopeVisibleTo(Builder $query, User $user): Builder
     {
         if ($user->role === Role::Client) {

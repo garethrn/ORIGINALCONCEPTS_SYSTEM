@@ -17,6 +17,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PwaController;
 use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\RecurringScheduleController;
+use App\Http\Controllers\StatementController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UserController;
@@ -94,6 +96,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::post('/quotes/{quote}/issue', [QuoteController::class, 'issue'])->name('quotes.issue');
     Route::post('/quotes/{quote}/send', [QuoteController::class, 'send'])->name('quotes.send');
     Route::post('/quotes/{quote}/decision', [QuoteController::class, 'accept'])->name('quotes.decision');
+    Route::post('/quotes/{quote}/choose', [QuoteController::class, 'choose'])->name('quotes.choose');
     Route::post('/quotes/{quote}/convert', [QuoteController::class, 'convert'])->name('quotes.convert');
     Route::get('/quotes/{quote}/pdf', [QuoteController::class, 'pdf'])->name('quotes.pdf');
 
@@ -114,6 +117,19 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::post('/credit-notes/{creditNote}/issue', [CreditNoteController::class, 'issue'])->name('credit-notes.issue');
     Route::post('/credit-notes/{creditNote}/send', [CreditNoteController::class, 'send'])->name('credit-notes.send');
     Route::get('/credit-notes/{creditNote}/pdf', [CreditNoteController::class, 'pdf'])->name('credit-notes.pdf');
+
+    Route::get('/recurring', [RecurringScheduleController::class, 'index'])->name('recurring.index');
+    Route::get('/recurring/create', [RecurringScheduleController::class, 'create'])->name('recurring.create');
+    Route::post('/recurring', [RecurringScheduleController::class, 'store'])->name('recurring.store');
+    Route::get('/recurring/{schedule}', [RecurringScheduleController::class, 'show'])->name('recurring.show');
+    Route::get('/recurring/{schedule}/edit', [RecurringScheduleController::class, 'edit'])->name('recurring.edit');
+    Route::put('/recurring/{schedule}', [RecurringScheduleController::class, 'update'])->name('recurring.update');
+    Route::post('/recurring/{schedule}/run', [RecurringScheduleController::class, 'run'])->name('recurring.run');
+    Route::delete('/recurring/{schedule}', [RecurringScheduleController::class, 'destroy'])->name('recurring.destroy');
+
+    Route::get('/clients/{client}/statement', [StatementController::class, 'show'])->name('clients.statement');
+    Route::get('/clients/{client}/statement.pdf', [StatementController::class, 'pdf'])->name('clients.statement.pdf');
+    Route::get('/clients/{client}/statement.csv', [StatementController::class, 'csv'])->name('clients.statement.csv');
 
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
     Route::get('/payments/create', [PaymentController::class, 'create'])->name('payments.create');

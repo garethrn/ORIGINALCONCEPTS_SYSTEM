@@ -57,7 +57,11 @@
     <tbody>
     @foreach ($document->lines as $line)
         <tr>
-            <td>{{ $line->description }}@if($line->price_includes_vat) <span class="muted">(price incl. VAT)</span>@endif</td>
+            <td>{{ $line->description }}@if($line->price_includes_vat) <span class="muted">(price incl. VAT)</span>@endif
+                @if ($kind === 'quote' && ($line->is_optional ?? false)) <span class="muted">(optional)</span>
+                @elseif ($kind === 'quote' && ($line->option?->name)) <span class="muted">({{ $line->option->name }})</span>
+                @endif
+            </td>
             <td class="right">{{ rtrim(rtrim((string) $line->quantity, '0'), '.') }}</td>
             <td class="right">{{ \App\Support\Money::format(app(\App\Services\Billing\BillingSettings::class)->showPricesExclVat() ? $line->net_cents : $line->total_cents) }}</td>
             <td>{{ $line->vatLabel() }}</td>
@@ -72,6 +76,14 @@
     <tr><td>VAT</td><td class="right">{{ \App\Support\Money::format($document->vat_cents) }}</td></tr>
     <tr><td><strong>Total</strong></td><td class="right"><strong>{{ \App\Support\Money::format($document->total_cents) }}</strong></td></tr>
 </table>
+@if ($kind === 'quote' && $document->options->isNotEmpty())
+    <p>The total is {{ $document->selectedOption?->name ?? $document->options->first()?->name }}. The customer chooses one option.</p>
+    <ul>
+        @foreach ($document->options as $option)
+            <li>{{ $option->name }}: {{ \App\Support\Money::format($option->total_cents) }}</li>
+        @endforeach
+    </ul>
+@endif
 @if ($kind === 'invoice')
     @php $timeRows = app(\App\Services\Billing\InvoiceTimeSummary::class)->rows($document); @endphp
     @if ($timeRows !== [])

@@ -71,6 +71,13 @@ final class BillingSettings
         return $this->company->get('show_prices_excl_vat', '1') !== '0';
     }
 
+    public function fiscalYearStartMonth(): int
+    {
+        $month = (int) $this->company->get('fiscal_year_start_month', '3');
+
+        return $month >= 1 && $month <= 12 ? $month : 3;
+    }
+
     public function invoiceTimeLayout(): string
     {
         return $this->company->get('invoice_time_layout', 'summary') === 'detail' ? 'detail' : 'summary';

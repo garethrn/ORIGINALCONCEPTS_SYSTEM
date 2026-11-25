@@ -34,6 +34,13 @@
         <label class="text-sm">Standard VAT percent
             <input class="field" name="standard_vat_percent" value="{{ old('standard_vat_percent', $vatPercent) }}" required>
         </label>
+        <label class="text-sm">Financial year starts
+            <select class="field" name="fiscal_year_start_month">
+                @foreach (['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] as $index => $month)
+                    <option value="{{ $index + 1 }}" @selected((int) old('fiscal_year_start_month', $company['fiscal_year_start_month'] ?? 3) === $index + 1)>{{ $month }}</option>
+                @endforeach
+            </select>
+        </label>
         <label class="text-sm">Time on invoices
             <select class="field" name="invoice_time_layout">
                 <option value="summary" @selected(old('invoice_time_layout', $company['invoice_time_layout'] ?? 'summary') === 'summary')>Summary per ticket</option>

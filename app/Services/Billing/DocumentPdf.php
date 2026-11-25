@@ -14,6 +14,9 @@ final class DocumentPdf
     public function render(Invoice|Quote|CreditNote $document): string
     {
         $document->loadMissing(['client', 'contact', 'lines']);
+        if ($document instanceof Quote) {
+            $document->loadMissing(['options', 'lines.option', 'selectedOption']);
+        }
         if ($document instanceof CreditNote) {
             $document->loadMissing('invoice');
         }
