@@ -171,6 +171,10 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::post('/bills/{bill}/issue', [PurchaseController::class, 'issueBill'])->name('bills.issue');
     Route::post('/bills/{bill}/pay', [PurchaseController::class, 'payBill'])->name('bills.pay');
     Route::post('/expenses', [PurchaseController::class, 'storeExpense'])->name('expenses.store');
+    Route::post('/suppliers/{supplier}/purchase-orders', [PurchaseController::class, 'storeOrder'])->name('purchase-orders.store');
+    Route::get('/purchase-orders/{order}', [PurchaseController::class, 'showOrder'])->name('purchase-orders.show');
+    Route::post('/purchase-orders/{order}/issue', [PurchaseController::class, 'issueOrder'])->name('purchase-orders.issue');
+    Route::post('/purchase-orders/{order}/receive', [PurchaseController::class, 'receiveOrder'])->name('purchase-orders.receive');
 
     Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');
     Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');

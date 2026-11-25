@@ -13,7 +13,7 @@ class BillLine extends Model
     use HasDocumentLines;
 
     protected $fillable = [
-        'bill_id', 'description', 'quantity', 'unit_price_cents', 'price_includes_vat',
+        'bill_id', 'product_id', 'description', 'quantity', 'unit_price_cents', 'price_includes_vat',
         'vat_code', 'vat_basis_points', 'net_cents', 'vat_cents', 'total_cents', 'sort_order',
     ];
 

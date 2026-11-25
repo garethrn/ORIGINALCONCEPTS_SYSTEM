@@ -11,6 +11,7 @@ enum DocumentType: string
     case CreditNote = 'credit_note';
     case Bill = 'bill';
     case Expense = 'expense';
+    case PurchaseOrder = 'purchase_order';
 
     public function prefix(): string
     {
@@ -20,6 +21,7 @@ enum DocumentType: string
             self::CreditNote => 'CN',
             self::Bill => 'BILL',
             self::Expense => 'EXP',
+            self::PurchaseOrder => 'PO',
         };
     }
 }

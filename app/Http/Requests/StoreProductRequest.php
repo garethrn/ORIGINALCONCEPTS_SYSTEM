@@ -38,6 +38,8 @@ class StoreProductRequest extends FormRequest
             'price_includes_vat' => ['required', 'boolean'],
             'vat_code' => ['required', Rule::enum(VatCode::class)],
             'is_active' => ['required', 'boolean'],
+            'track_stock' => ['nullable', 'boolean'],
+            'quantity_on_hand' => ['nullable', 'regex:/^-?\d+(\.\d{1,3})?$/'],
         ];
     }
 
@@ -46,6 +48,7 @@ class StoreProductRequest extends FormRequest
         $this->merge([
             'price_includes_vat' => filter_var($this->input('price_includes_vat', false), FILTER_VALIDATE_BOOLEAN),
             'is_active' => filter_var($this->input('is_active', true), FILTER_VALIDATE_BOOLEAN),
+            'track_stock' => filter_var($this->input('track_stock', false), FILTER_VALIDATE_BOOLEAN),
             'sku' => strtoupper(trim((string) $this->input('sku'))),
         ]);
     }

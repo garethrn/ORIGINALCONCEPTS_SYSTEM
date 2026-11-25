@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 
 #[Fillable([
     'sku', 'name', 'description', 'type', 'unit', 'unit_price_cents',
-    'price_includes_vat', 'vat_code', 'is_active',
+    'price_includes_vat', 'vat_code', 'is_active', 'track_stock', 'quantity_on_hand',
 ])]
 class Product extends Model
 {
@@ -27,6 +27,8 @@ class Product extends Model
             'vat_code' => VatCode::class,
             'price_includes_vat' => 'boolean',
             'is_active' => 'boolean',
+            'track_stock' => 'boolean',
+            'quantity_on_hand' => 'decimal:3',
         ];
     }
 }

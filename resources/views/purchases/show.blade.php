@@ -16,6 +16,20 @@
             <input type="hidden" name="lines[0][vat_code]" value="standard">
             <button class="btn btn-primary" type="submit">Save draft bill</button>
         </form>
+        <form method="POST" action="{{ route('purchase-orders.store', $supplier) }}" class="space-y-2 rounded-2xl bg-white p-4 shadow-sm">
+            @csrf
+            <h2 class="font-semibold">Purchase order</h2>
+            <input class="field" name="lines[0][description]" placeholder="Description" required>
+            <select class="field" name="lines[0][product_id]">
+                <option value="">Not a stock item</option>
+                @foreach ($products as $product)<option value="{{ $product->id }}">{{ $product->sku }} {{ $product->name }}</option>@endforeach
+            </select>
+            <input class="field" name="lines[0][quantity]" value="1" required>
+            <input class="field" name="lines[0][unit_price]" placeholder="Unit price excl VAT" required>
+            <input type="hidden" name="lines[0][vat_code]" value="standard">
+            <input class="field" type="date" name="expected_on">
+            <button class="btn btn-ghost" type="submit">Save purchase order</button>
+        </form>
         <form method="POST" action="{{ route('expenses.store') }}" class="space-y-2 rounded-2xl bg-white p-4 shadow-sm">
             @csrf
             <h2 class="font-semibold">Expense paid from the bank</h2>

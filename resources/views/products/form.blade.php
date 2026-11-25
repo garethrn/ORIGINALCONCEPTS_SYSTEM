@@ -11,6 +11,8 @@
         <select class="field" name="vat_code">@foreach (\App\Enums\VatCode::cases() as $code)<option value="{{ $code->value }}" @selected(old('vat_code', $product->vat_code?->value ?: 'standard') === $code->value)>{{ $code->label() }}</option>@endforeach</select>
         <input type="hidden" name="price_includes_vat" value="0"><label class="text-sm"><input type="checkbox" name="price_includes_vat" value="1" @checked(old('price_includes_vat', $product->price_includes_vat))> Price includes VAT</label>
         <input type="hidden" name="is_active" value="0"><label class="text-sm"><input type="checkbox" name="is_active" value="1" @checked(old('is_active', $product->is_active ?? true))> Active</label>
+        <input type="hidden" name="track_stock" value="0"><label class="text-sm"><input type="checkbox" name="track_stock" value="1" @checked(old('track_stock', $product->track_stock))> Track stock</label>
+        <input class="field" name="quantity_on_hand" value="{{ old('quantity_on_hand', $product->quantity_on_hand ?? '0') }}" placeholder="Quantity on hand">
         <textarea class="field md:col-span-2" name="description" rows="3">{{ old('description', $product->description) }}</textarea>
         <div class="md:col-span-2"><button class="btn btn-primary" type="submit">Save</button></div>
     </form>

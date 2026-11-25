@@ -9,6 +9,7 @@ use App\Enums\DocumentType;
 use App\Models\CreditNote;
 use App\Models\User;
 use App\Services\Accounting\Ledger;
+use App\Services\Inventory\Stock;
 use App\Services\Audit\AuditLogger;
 use App\Services\Billing\CompanyProfile;
 use App\Services\Billing\DocumentNumberer;
@@ -22,6 +23,7 @@ final class IssueCreditNote
         private readonly CompanyProfile $company,
         private readonly InvoiceSettlement $settlement,
         private readonly Ledger $ledger,
+        private readonly Stock $stock,
         private readonly AuditLogger $audit,
     ) {}
 
@@ -46,6 +48,7 @@ final class IssueCreditNote
             $creditNote->issued_by = $actor->id;
             $creditNote->save();
             $this->ledger->postCreditNote($creditNote, $actor);
+            $this->stock->receiveCreditNote($creditNote);
             $this->settlement->refresh($creditNote->invoice);
             $this->audit->log('credit_note.issued', $creditNote, null, [
                 'number' => $creditNote->number,

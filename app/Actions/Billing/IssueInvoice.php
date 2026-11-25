@@ -10,6 +10,7 @@ use App\Models\Invoice;
 use App\Models\User;
 use App\Services\Audit\AuditLogger;
 use App\Services\Accounting\Ledger;
+use App\Services\Inventory\Stock;
 use App\Services\Billing\CompanyProfile;
 use App\Services\Billing\DocumentNumberer;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,7 @@ final class IssueInvoice
         private readonly DocumentNumberer $numbers,
         private readonly CompanyProfile $company,
         private readonly Ledger $ledger,
+        private readonly Stock $stock,
         private readonly AuditLogger $audit,
     ) {}
 
@@ -53,6 +55,7 @@ final class IssueInvoice
             $invoice->issued_by = $actor->id;
             $invoice->save();
             $this->ledger->postInvoice($invoice, $actor);
+            $this->stock->receiveInvoice($invoice);
             $this->audit->log('invoice.issued', $invoice, $before, $invoice->auditSnapshot(), $actor->id);
 
             return $invoice->fresh(['lines', 'client']);

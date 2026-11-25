@@ -40,6 +40,7 @@ class ProductController extends Controller
         $data = $request->validated();
         $data['unit_price_cents'] = Money::randsToCents($data['unit_price']);
         unset($data['unit_price']);
+        $data['quantity_on_hand'] = $data['quantity_on_hand'] ?? '0';
         Product::query()->create($data);
 
         return redirect()->route('products.index')->with('status', 'Product saved.');
@@ -57,6 +58,9 @@ class ProductController extends Controller
         $data = $request->validated();
         $data['unit_price_cents'] = Money::randsToCents($data['unit_price']);
         unset($data['unit_price']);
+        if (! array_key_exists('quantity_on_hand', $data) || $data['quantity_on_hand'] === null) {
+            unset($data['quantity_on_hand']);
+        }
         $product->update($data);
 
         return redirect()->route('products.index')->with('status', 'Product updated.');

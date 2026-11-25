@@ -10,8 +10,10 @@ use App\Models\Account;
 use App\Models\BankAccount;
 use App\Models\Bill;
 use App\Models\Expense;
+use App\Models\PurchaseOrder;
 use App\Models\Supplier;
 use App\Services\Accounting\Ledger;
+use App\Services\Inventory\Stock;
 use App\Services\Billing\DocumentLineWriter;
 use App\Services\Billing\DocumentNumberer;
 use App\Services\Billing\VatCalculator;
@@ -52,8 +54,9 @@ class PurchaseController extends Controller
         $this->guard();
         $supplier->load(['bills' => fn ($query) => $query->latest()]);
         $accounts = Account::query()->where('active', true)->where('type', 'expense')->orderBy('code')->get();
+        $products = \App\Models\Product::query()->where('is_active', true)->orderBy('name')->get();
 
-        return view('purchases.show', compact('supplier', 'accounts'));
+        return view('purchases.show', compact('supplier', 'accounts', 'products'));
     }
 
     public function storeBill(Request $request, Supplier $supplier, DocumentLineWriter $writer): RedirectResponse
@@ -82,23 +85,118 @@ class PurchaseController extends Controller
         return back()->with('status', 'Draft bill saved.');
     }
 
-    public function issueBill(Bill $bill, DocumentNumberer $numbers, Ledger $ledger): RedirectResponse
+    public function issueBill(Bill $bill): RedirectResponse
     {
         $this->guard();
-        DB::transaction(function () use ($bill, $numbers, $ledger) {
+        $this->issue($bill);
+
+        return back()->with('status', 'Bill issued and posted to the ledger.');
+    }
+
+    public function storeOrder(Request $request, Supplier $supplier, DocumentLineWriter $writer): RedirectResponse
+    {
+        $this->guard();
+        $data = $this->lines($request);
+        $built = $writer->build($data['lines']);
+        $order = new PurchaseOrder([
+            'supplier_id' => $supplier->id,
+            'notes' => $data['notes'] ?? null,
+            'expected_on' => $data['expected_on'] ?? null,
+            'created_by' => $request->user()->id,
+        ]);
+        $order->status = 'draft';
+        $order->subtotal_cents = $built['subtotal_cents'];
+        $order->vat_cents = $built['vat_cents'];
+        $order->total_cents = $built['total_cents'];
+        $order->save();
+        foreach ($built['lines'] as $index => $line) {
+            $line['product_id'] = $data['lines'][$index]['product_id'] ?? null;
+            unset($line['source_id']);
+            $order->lines()->create($line);
+        }
+
+        return redirect()->route('purchase-orders.show', $order)->with('status', 'Draft purchase order saved.');
+    }
+
+    public function showOrder(PurchaseOrder $order): View
+    {
+        $this->guard();
+        $order->load('supplier', 'lines.product', 'bill');
+
+        return view('purchases.order', compact('order'));
+    }
+
+    public function issueOrder(PurchaseOrder $order, DocumentNumberer $numbers): RedirectResponse
+    {
+        $this->guard();
+        if ($order->isDraft()) {
+            $order->number = $numbers->next(DocumentType::PurchaseOrder);
+            $order->status = 'issued';
+            $order->issue_date = today();
+            $order->save();
+        }
+
+        return back()->with('status', 'Purchase order '.$order->number.' issued.');
+    }
+
+    public function receiveOrder(PurchaseOrder $order): RedirectResponse
+    {
+        $this->guard();
+        if ($order->status !== 'issued') {
+            return back()->with('error', 'Issue the purchase order before receiving it.');
+        }
+        $order->load('lines');
+        $bill = new Bill([
+            'supplier_id' => $order->supplier_id,
+            'supplier_reference' => $order->number,
+            'notes' => 'Received from '.$order->number,
+            'created_by' => request()->user()->id,
+        ]);
+        $bill->status = 'draft';
+        $bill->subtotal_cents = $order->subtotal_cents;
+        $bill->vat_cents = $order->vat_cents;
+        $bill->total_cents = $order->total_cents;
+        $bill->save();
+        foreach ($order->lines as $line) {
+            $bill->lines()->create([
+                'product_id' => $line->product_id,
+                'description' => $line->description,
+                'quantity' => $line->quantity,
+                'unit_price_cents' => $line->unit_price_cents,
+                'price_includes_vat' => $line->price_includes_vat,
+                'vat_code' => $line->vat_code->value,
+                'vat_basis_points' => $line->vat_basis_points,
+                'net_cents' => $line->net_cents,
+                'vat_cents' => $line->vat_cents,
+                'total_cents' => $line->total_cents,
+                'sort_order' => $line->sort_order,
+            ]);
+        }
+        $bill = $this->issue($bill);
+        $order->status = 'received';
+        $order->bill_id = $bill->id;
+        $order->save();
+
+        return redirect()->route('purchase-orders.show', $order)->with('status', 'Goods received. Bill '.$bill->number.' was posted and stock was updated.');
+    }
+
+    private function issue(Bill $bill): Bill
+    {
+        return DB::transaction(function () use ($bill) {
             $bill = Bill::query()->whereKey($bill->id)->lockForUpdate()->firstOrFail();
             if (! $bill->isDraft()) {
-                return;
+                return $bill;
             }
-            $bill->number = $numbers->next(DocumentType::Bill);
+            $bill->number = app(DocumentNumberer::class)->next(DocumentType::Bill);
             $bill->status = 'open';
             $bill->issue_date = today();
             $bill->due_date = today()->addDays((int) $bill->supplier->payment_terms_days);
             $bill->save();
-            $ledger->postBill($bill, request()->user());
-        });
+            app(Ledger::class)->postBill($bill, request()->user());
+            app(Stock::class)->receiveBill($bill);
 
-        return back()->with('status', 'Bill issued and posted to the ledger.');
+            return $bill;
+        });
     }
 
     public function payBill(Bill $bill, Ledger $ledger): RedirectResponse
@@ -200,9 +298,11 @@ class PurchaseController extends Controller
         $data = $request->validate([
             'supplier_reference' => ['nullable', 'string', 'max:80'],
             'notes' => ['nullable', 'string', 'max:2000'],
+            'expected_on' => ['nullable', 'date'],
             'expense_account_id' => ['nullable', 'integer', 'exists:accounts,id'],
             'capital' => ['nullable', 'boolean'],
             'lines' => ['required', 'array', 'min:1'],
+            'lines.*.product_id' => ['nullable', 'integer', 'exists:products,id'],
             'lines.*.description' => ['required', 'string', 'max:500'],
             'lines.*.quantity' => ['required', 'regex:/^\d+(\.\d{1,3})?$/'],
             'lines.*.unit_price' => ['required', 'regex:/^-?\d+(\.\d{1,2})?$/'],
@@ -211,6 +311,9 @@ class PurchaseController extends Controller
         ]);
         foreach ($data['lines'] as $index => $line) {
             $data['lines'][$index]['includes_vat'] = $request->boolean('lines.'.$index.'.includes_vat');
+            if (($line['product_id'] ?? '') === '') {
+                $data['lines'][$index]['product_id'] = null;
+            }
         }
 
         return $data;
