@@ -2,7 +2,7 @@
 @section('content')
     <div class="mb-2 text-sm text-slate-500">{{ $ticket->reference() }} · {{ $ticket->category->label() }} · {{ $ticket->priority->label() }}</div>
     <h1 class="mb-2 text-2xl font-semibold text-oc-navy">{{ $ticket->subject }}</h1>
-    <div class="mb-4 text-sm">{{ $ticket->client?->displayName() }} · {{ $ticket->status->label() }} · SLA {{ optional($ticket->sla_due_at)->timezone(config('app.timezone'))->format('d M Y H:i') }}</div>
+    <div class="mb-4 text-sm">{{ $ticket->client?->displayName() }} · <x-status :value="$ticket->status" /> · SLA {{ optional($ticket->sla_due_at)->timezone(config('app.timezone'))->format('d M Y H:i') }}</div>
     <div class="rounded-2xl bg-white p-4 shadow-sm whitespace-pre-wrap">{{ $ticket->description }}</div>
     @if ($ticket->site?->directionsUrl())
         <a class="mt-3 inline-block text-sm text-oc-blue" href="{{ $ticket->site->directionsUrl() }}">Directions to {{ $ticket->site->name }}</a>

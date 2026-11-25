@@ -6,7 +6,7 @@
     </div>
     <div class="rounded-2xl bg-white p-4 shadow-sm">
         <div class="font-semibold">{{ $quote->client?->displayName() }}</div>
-        <div class="text-sm text-slate-600">Status {{ $quote->status->label() }} · Valid until {{ optional($quote->valid_until)->format('d M Y') ?: '—' }}</div>
+        <div class="text-sm text-slate-600"><x-status :value="$quote->status" /> · Valid until {{ optional($quote->valid_until)->format('d M Y') ?: '—' }}</div>
         <div class="mt-3 text-lg font-semibold">{{ \App\Support\Money::format($quote->total_cents) }}</div>
         <ul class="mt-3 space-y-1 text-sm">
             @foreach ($quote->lines as $line)

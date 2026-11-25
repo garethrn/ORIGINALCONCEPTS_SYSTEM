@@ -3,7 +3,7 @@
     <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
         <div>
             <h1 class="text-2xl font-semibold text-oc-navy">Purchase order {{ $order->number ?: 'draft' }}</h1>
-            <div class="text-sm text-slate-600">{{ $order->supplier?->name }} · {{ ucfirst($order->status) }}</div>
+            <div class="text-sm text-slate-600">{{ $order->supplier?->name }} · <x-status :value="ucfirst($order->status)" /></div>
         </div>
         <a class="btn btn-ghost" href="{{ route('suppliers.show', $order->supplier_id) }}">Supplier</a>
     </div>

@@ -34,7 +34,7 @@
         <a href="{{ route('dashboard') }}"><img src="{{ asset('brand/logo.png') }}" alt="Original Concepts" class="oc-logo"></a>
         <div class="ml-auto text-sm">{{ $user->name }}</div>
     </div>
-    <nav data-nav class="hidden border-t border-white/10 lg:block">
+    <nav data-nav class="hidden border-t border-slate-200 lg:block">
         <div class="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-2 lg:flex-row lg:flex-wrap lg:items-center">
             @foreach ($links as [$label, $href, $show])
                 @if ($show)
@@ -42,10 +42,10 @@
                     <a class="rounded-lg px-3 py-2 text-sm {{ request()->is($path) || request()->is($path.'/*') ? 'is-active' : '' }}" href="{{ $href }}">{{ $label }}</a>
                 @endif
             @endforeach
-            <a class="rounded-lg px-3 py-2 text-sm hover:bg-white/10 lg:ml-auto" href="{{ route('profile.edit') }}">Profile</a>
+            <a class="rounded-lg px-3 py-2 text-sm lg:ml-auto" href="{{ route('profile.edit') }}">Profile</a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button class="rounded-lg px-3 py-2 text-sm hover:bg-white/10" type="submit">Sign out</button>
+                <button class="rounded-lg px-3 py-2 text-sm" type="submit">Sign out</button>
             </form>
         </div>
     </nav>

@@ -6,7 +6,7 @@
             <thead class="bg-slate-50 text-left text-xs uppercase text-slate-500"><tr><th class="px-4 py-2">Number</th><th class="px-4 py-2">Customer</th><th class="px-4 py-2">Status</th><th class="px-4 py-2">Total</th></tr></thead>
             <tbody>
             @foreach ($invoices as $invoice)
-                <tr class="border-t"><td class="px-4 py-3"><a class="text-oc-blue" href="{{ route('invoices.show', $invoice) }}">{{ $invoice->number ?: 'Draft' }}</a></td><td class="px-4 py-3">{{ $invoice->client?->displayName() }}</td><td class="px-4 py-3">{{ $invoice->status->label() }}@if($invoice->isOverdue()) · overdue @endif</td><td class="px-4 py-3">{{ \App\Support\Money::format($invoice->total_cents) }}</td></tr>
+                <tr class="border-t"><td class="px-4 py-3"><a class="text-oc-blue" href="{{ route('invoices.show', $invoice) }}">{{ $invoice->number ?: 'Draft' }}</a></td><td class="px-4 py-3">{{ $invoice->client?->displayName() }}</td><td class="px-4 py-3"><x-status :value="$invoice->status" />@if($invoice->isOverdue()) <x-status value="Overdue" />@endif</td><td class="px-4 py-3">{{ \App\Support\Money::format($invoice->total_cents) }}</td></tr>
             @endforeach
             </tbody>
         </table>

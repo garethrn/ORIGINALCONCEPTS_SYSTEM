@@ -22,7 +22,7 @@
                 <thead class="bg-slate-50 text-left text-xs uppercase text-slate-500"><tr><th class="px-4 py-2">Ref</th><th class="px-4 py-2">Subject</th><th class="px-4 py-2">Customer</th><th class="px-4 py-2">Status</th></tr></thead>
                 <tbody>
                 @forelse ($recent as $ticket)
-                    <tr class="border-t"><td class="px-4 py-3">{{ $ticket->reference() }}</td><td class="px-4 py-3"><a class="text-oc-blue" href="{{ route('tickets.show', $ticket) }}">{{ $ticket->subject }}</a></td><td class="px-4 py-3">{{ $ticket->client?->displayName() }}</td><td class="px-4 py-3">{{ $ticket->status->label() }}</td></tr>
+                    <tr class="border-t"><td class="px-4 py-3">{{ $ticket->reference() }}</td><td class="px-4 py-3"><a class="text-oc-blue" href="{{ route('tickets.show', $ticket) }}">{{ $ticket->subject }}</a></td><td class="px-4 py-3">{{ $ticket->client?->displayName() }}</td><td class="px-4 py-3"><x-status :value="$ticket->status" /></td></tr>
                 @empty
                     <tr><td class="px-4 py-6 text-slate-500" colspan="4">No tickets yet.</td></tr>
                 @endforelse

@@ -6,7 +6,7 @@
         body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color: #1a1206; background: #ffffff; }
         h1 { font-size: 22px; margin: 8px 0 0; border-bottom: 3px solid #f5a623; padding-bottom: 6px; }
         table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-        th { background: #f5a623; color: #1a1206; text-align: left; padding: 6px; }
+        th { background: #f3f4f6; color: #1f2937; text-align: left; padding: 6px; border-bottom: 2px solid #f5a623; }
         td { border-bottom: 1px solid #e6d3a1; padding: 6px; }
         .right { text-align: right; }
     </style>

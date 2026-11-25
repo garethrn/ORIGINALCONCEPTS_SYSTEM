@@ -45,8 +45,8 @@ return [
     'pwa' => [
         'name' => 'Original Concepts Support',
         'short_name' => 'OC Support',
-        'theme_color' => '#0b0f1a',
-        'background_color' => '#0b0f1a',
+        'theme_color' => '#ffffff',
+        'background_color' => '#f6f7f9',
     ],
 
 ];
