@@ -1,0 +1,110 @@
+# Original Concepts Support. This file is only for the oc-support project.
+# The published port is fixed to 127.0.0.1 so it cannot take over ports 80 or 443
+# or the addresses used by other apps on the same VPS.
+name: oc-support
+
+services:
+  app:
+    build: .
+    image: oc-support:local
+    command: ["web"]
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      RUN_MIGRATIONS: "true"
+    ports:
+      - "127.0.0.1:${APP_BIND_PORT:-8085}:8080"
+    volumes:
+      - oc-support-storage:/var/www/html/storage
+    networks:
+      - db
+      - egress
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  queue:
+    image: oc-support:local
+    command: ["php", "artisan", "queue:work", "--sleep=3", "--tries=3", "--max-time=3600"]
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      RUN_MIGRATIONS: "false"
+      QUEUE_CONNECTION: database
+    volumes:
+      - oc-support-storage:/var/www/html/storage
+    networks:
+      - db
+      - egress
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      disable: true
+
+  scheduler:
+    image: oc-support:local
+    command: ["php", "artisan", "schedule:work"]
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      RUN_MIGRATIONS: "false"
+    volumes:
+      - oc-support-storage:/var/www/html/storage
+    networks:
+      - db
+      - egress
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      disable: true
+
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-oc_support}
+      MYSQL_USER: ${DB_USERNAME:-oc_support}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Set DB_ROOT_PASSWORD}
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - oc-support-mysql:/var/lib/mysql
+    networks:
+      - db
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+networks:
+  db:
+    internal: true
+  egress:
+
+volumes:
+  oc-support-mysql:
+    name: oc-support-mysql
+  oc-support-storage:
+    name: oc-support-storage

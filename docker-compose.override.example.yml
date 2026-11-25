@@ -1,0 +1,18 @@
+# Copy to docker-compose.override.yml on the VPS. That name is gitignored.
+# deploy/update.sh and deploy/backup.sh add the copy automatically when it
+# exists. The Compose project stays oc-support. Do not publish host ports here.
+#
+# This joins the app to the external network used by a Dockerised reverse
+# proxy (Caddy on this server). Change the network name if the proxy's
+# network is not ormsa-bot_default.
+
+services:
+  app:
+    networks:
+      ormsa-bot_default:
+        aliases:
+          - oc-support-app
+
+networks:
+  ormsa-bot_default:
+    external: true
