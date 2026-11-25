@@ -8,6 +8,7 @@ use App\Enums\PaymentMethod;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\User;
+use App\Services\Accounting\Ledger;
 use App\Services\Audit\AuditLogger;
 use App\Support\Money;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +18,7 @@ final class RecordPayment
 {
     public function __construct(
         private readonly InvoiceSettlement $settlement,
+        private readonly Ledger $ledger,
         private readonly AuditLogger $audit,
     ) {}
 
@@ -78,6 +80,7 @@ final class RecordPayment
                 $this->settlement->refresh($invoice);
             }
 
+            $this->ledger->postPayment($payment, $actor);
             $this->audit->log('payment.recorded', $payment, null, [
                 'amount_cents' => $amount,
                 'allocated_cents' => $allocated,

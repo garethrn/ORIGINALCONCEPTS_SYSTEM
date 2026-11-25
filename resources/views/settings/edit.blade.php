@@ -34,6 +34,12 @@
         <label class="text-sm">Standard VAT percent
             <input class="field" name="standard_vat_percent" value="{{ old('standard_vat_percent', $vatPercent) }}" required>
         </label>
+        <label class="text-sm">VAT basis
+            <select class="field" name="vat_basis">
+                <option value="invoice" @selected(old('vat_basis', $company['vat_basis'] ?? 'invoice') === 'invoice')>Invoice basis</option>
+                <option value="cash" @selected(old('vat_basis', $company['vat_basis'] ?? 'invoice') === 'cash')>Cash basis</option>
+            </select>
+        </label>
         <label class="text-sm">Financial year starts
             <select class="field" name="fiscal_year_start_month">
                 @foreach (['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] as $index => $month)

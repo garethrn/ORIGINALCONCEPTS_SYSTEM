@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AssistantController;
+use App\Http\Controllers\BankingController;
 use App\Http\Controllers\BillingWizardController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\LoginController;
@@ -12,8 +14,10 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DebtorController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\JournalController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PwaController;
 use App\Http\Controllers\QuoteController;
@@ -136,6 +140,31 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
     Route::get('/payments/{payment}', [PaymentController::class, 'show'])->name('payments.show');
     Route::get('/debtors', DebtorController::class)->name('debtors.index');
+
+    Route::get('/accounts', [AccountController::class, 'index'])->name('accounts.index');
+    Route::get('/accounts/create', [AccountController::class, 'create'])->name('accounts.create');
+    Route::post('/accounts', [AccountController::class, 'store'])->name('accounts.store');
+    Route::get('/accounts/{account}/edit', [AccountController::class, 'edit'])->name('accounts.edit');
+    Route::put('/accounts/{account}', [AccountController::class, 'update'])->name('accounts.update');
+
+    Route::get('/journals', [JournalController::class, 'index'])->name('journals.index');
+    Route::get('/journals/create', [JournalController::class, 'create'])->name('journals.create');
+    Route::post('/journals', [JournalController::class, 'store'])->name('journals.store');
+    Route::get('/journals/{entry}', [JournalController::class, 'show'])->name('journals.show');
+
+    Route::get('/banking', [BankingController::class, 'index'])->name('banking.index');
+    Route::get('/banking/{bankAccount}', [BankingController::class, 'show'])->name('banking.show');
+    Route::post('/banking/{bankAccount}/import', [BankingController::class, 'import'])->name('banking.import');
+    Route::post('/banking/{bankAccount}/rules', [BankingController::class, 'rule'])->name('banking.rules.store');
+    Route::post('/banking/{bankAccount}/reconcile', [BankingController::class, 'reconcile'])->name('banking.reconcile');
+    Route::post('/bank-transactions/{transaction}/match', [BankingController::class, 'match'])->name('banking.match');
+
+    Route::get('/suppliers', [PurchaseController::class, 'index'])->name('suppliers.index');
+    Route::post('/suppliers', [PurchaseController::class, 'storeSupplier'])->name('suppliers.store');
+    Route::get('/suppliers/{supplier}', [PurchaseController::class, 'show'])->name('suppliers.show');
+    Route::post('/suppliers/{supplier}/bills', [PurchaseController::class, 'storeBill'])->name('bills.store');
+    Route::post('/bills/{bill}/issue', [PurchaseController::class, 'issueBill'])->name('bills.issue');
+    Route::post('/expenses', [PurchaseController::class, 'storeExpense'])->name('expenses.store');
 
     Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');
     Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');

@@ -71,6 +71,11 @@ final class BillingSettings
         return $this->company->get('show_prices_excl_vat', '1') !== '0';
     }
 
+    public function vatBasis(): string
+    {
+        return $this->company->get('vat_basis', 'invoice') === 'cash' ? 'cash' : 'invoice';
+    }
+
     public function fiscalYearStartMonth(): int
     {
         $month = (int) $this->company->get('fiscal_year_start_month', '3');

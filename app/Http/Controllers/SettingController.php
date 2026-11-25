@@ -57,6 +57,7 @@ class SettingController extends Controller
             'show_prices_excl_vat' => ['nullable', 'boolean'],
             'invoice_time_layout' => ['required', 'in:summary,detail'],
             'fiscal_year_start_month' => ['nullable', 'integer', 'min:1', 'max:12'],
+            'vat_basis' => ['nullable', 'in:invoice,cash'],
         ]);
         if (bccomp($data['after_hours_multiplier'], '0', 2) !== 1) {
             return back()->withErrors(['after_hours_multiplier' => 'The after-hours multiplier must be above zero.'])->withInput();

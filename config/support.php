@@ -31,6 +31,7 @@ return [
         'show_prices_excl_vat' => '1',
         'invoice_time_layout' => 'summary',
         'fiscal_year_start_month' => '3',
+        'vat_basis' => 'invoice',
     ],
 
     'ai' => [
