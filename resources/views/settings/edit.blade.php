@@ -1,6 +1,9 @@
 @extends('layouts.app')
 @section('content')
-    <h1 class="mb-4 text-2xl font-semibold text-oc-navy">Company settings</h1>
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <h1 class="text-2xl font-semibold text-oc-navy">Company settings</h1>
+        <a class="btn btn-ghost" href="{{ route('bank-feeds.edit') }}">Bank feeds by email</a>
+    </div>
     <form method="POST" action="{{ route('settings.update') }}" class="grid gap-3 rounded-2xl bg-white p-4 shadow-sm md:grid-cols-2">
         @csrf @method('PUT')
         @foreach (['legal_name' => 'Legal name', 'trading_name' => 'Trading name', 'address_line1' => 'Address', 'address_line2' => 'Address line 2', 'city' => 'City', 'province' => 'Province', 'postal_code' => 'Postal code', 'country' => 'Country', 'vat_number' => 'VAT number', 'registration_number' => 'Registration number', 'phone' => 'Phone', 'email' => 'Email', 'website' => 'Website', 'bbbee' => 'B-BBEE level', 'bank_name' => 'Bank', 'bank_account' => 'Account number', 'branch_code' => 'Branch code'] as $key => $label)

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AssistantController;
+use App\Http\Controllers\BankFeedController;
 use App\Http\Controllers\BankingController;
 use App\Http\Controllers\BillingWizardController;
 use App\Http\Controllers\AuditLogController;
@@ -157,8 +158,18 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::post('/journals', [JournalController::class, 'store'])->name('journals.store');
     Route::get('/journals/{entry}', [JournalController::class, 'show'])->name('journals.show');
 
+    Route::get('/settings/bank-feeds', [BankFeedController::class, 'edit'])->name('bank-feeds.edit');
+    Route::put('/settings/bank-feeds', [BankFeedController::class, 'update'])->name('bank-feeds.update');
+    Route::get('/banking/review', [BankFeedController::class, 'review'])->name('banking.review');
+    Route::post('/banking/transactions/{transaction}/accept', [BankFeedController::class, 'accept'])->name('banking.review.accept');
+    Route::post('/banking/transactions/{transaction}/split', [BankFeedController::class, 'split'])->name('banking.review.split');
+    Route::post('/banking/transactions/{transaction}/expense', [BankFeedController::class, 'expense'])->name('banking.review.expense');
+    Route::post('/banking/transactions/{transaction}/ignore', [BankFeedController::class, 'ignore'])->name('banking.review.ignore');
+    Route::post('/banking/transactions/{transaction}/undo', [BankFeedController::class, 'undo'])->name('banking.review.undo');
+
     Route::get('/banking', [BankingController::class, 'index'])->name('banking.index');
     Route::get('/banking/{bankAccount}', [BankingController::class, 'show'])->name('banking.show');
+    Route::put('/banking/{bankAccount}/last4', [BankingController::class, 'last4'])->name('banking.last4');
     Route::post('/banking/{bankAccount}/import', [BankingController::class, 'import'])->name('banking.import');
     Route::post('/banking/{bankAccount}/rules', [BankingController::class, 'rule'])->name('banking.rules.store');
     Route::post('/banking/{bankAccount}/reconcile', [BankingController::class, 'reconcile'])->name('banking.reconcile');

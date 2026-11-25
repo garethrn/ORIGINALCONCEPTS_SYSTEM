@@ -1,6 +1,13 @@
 @extends('layouts.app')
 @section('content')
-    <h1 class="mb-4 text-2xl font-semibold text-oc-navy">{{ $bankAccount->name }}</h1>
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <h1 class="text-2xl font-semibold text-oc-navy">{{ $bankAccount->name }}</h1>
+        <form method="POST" action="{{ route('banking.last4', $bankAccount) }}" class="flex gap-2">
+            @csrf @method('PUT')
+            <input class="field max-w-[8rem]" name="account_last4" value="{{ $bankAccount->account_last4 }}" maxlength="4" placeholder="Last 4">
+            <button class="btn btn-ghost" type="submit">Save</button>
+        </form>
+    </div>
     <div class="grid gap-4 lg:grid-cols-2">
         <form method="POST" action="{{ route('banking.import', $bankAccount) }}" enctype="multipart/form-data" class="space-y-2 rounded-2xl bg-white p-4 shadow-sm">
             @csrf

@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class BankAccount extends Model
 {
-    protected $fillable = ['account_id', 'name', 'institution', 'active'];
+    protected $fillable = ['account_id', 'name', 'institution', 'active', 'account_last4'];
 
     protected function casts(): array
     {

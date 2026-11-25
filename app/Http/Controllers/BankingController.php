@@ -38,6 +38,16 @@ class BankingController extends Controller
         return view('banking.show', compact('bankAccount', 'transactions', 'accounts', 'suggestions'));
     }
 
+    public function last4(Request $request, BankAccount $bankAccount): RedirectResponse
+    {
+        $this->guard();
+        $data = $request->validate(['account_last4' => ['nullable', 'digits:4']]);
+        $bankAccount->account_last4 = $data['account_last4'] ?? null;
+        $bankAccount->save();
+
+        return back()->with('status', 'Account digits saved. Bank emails that end in these digits will land here.');
+    }
+
     public function import(Request $request, BankAccount $bankAccount, BankBook $book): RedirectResponse
     {
         $this->guard();
